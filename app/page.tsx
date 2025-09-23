@@ -1,5 +1,4 @@
-import Header from '@/components/Header'
-import EnhancedNavigation from '@/components/EnhancedNavigation'
+﻿import Header from '@/components/Header'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import EnhancedHeroSection from '@/components/EnhancedHeroSection'
 import ContentSection from '@/components/ContentSection'
@@ -8,7 +7,6 @@ import ErrorBoundary from '@/components/ErrorBoundary'
 import { getBaseUrl } from '@/lib/baseUrl'
 import { Suspense } from 'react'
 
-// Enhanced data fetching with better error handling
 async function getTrending() {
   try {
     const res = await fetch(`${getBaseUrl()}/api/trending?media_type=all&time_window=week`, {
@@ -104,52 +102,60 @@ export default async function HomePage() {
   const topRatedTV = Array.isArray(topRatedTVData.results) ? topRatedTVData.results : []
   const upcomingMovies = Array.isArray(upcomingMoviesData.results) ? upcomingMoviesData.results : []
 
+  const heroItems =
+    trendingItems.length > 0
+      ? trendingItems
+      : popularMovies.length > 0
+      ? popularMovies
+      : popularTV.length > 0
+      ? popularTV
+      : topRatedMovies.length > 0
+      ? topRatedMovies
+      : topRatedTV.length > 0
+      ? topRatedTV
+      : upcomingMovies
+
   const allEmpty = [
     trendingItems.length,
     upcomingMovies.length,
     popularMovies.length,
     popularTV.length,
     topRatedMovies.length,
-    topRatedTV.length,
+    topRatedTV.length
   ].every((n) => n === 0)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">
       <Header />
-      <EnhancedNavigation />
 
       <main className="relative">
-        {/* Hero Section */}
         <Suspense fallback={<LoadingSkeleton type="hero" />}>
-          <EnhancedHeroSection items={trendingItems} />
+          <div id="hero-section">
+            <EnhancedHeroSection items={heroItems} />
+          </div>
         </Suspense>
 
-        {/* Content Sections */}
         <div className="space-y-16 pb-20">
           {trendingItems.length > 0 && (
-            <ErrorBoundary fallback={<div className="text-center text-gray-400 py-8">Failed to load trending content</div>}>
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load trending content</div>}>
               <ContentSection
+                sectionId="trending-section"
                 title="Trending Now"
+                subtitle="Most watched across movies and TV this week."
+                icon="TN"
                 items={trendingItems.slice(0, 20)}
                 viewAllHref="/"
               />
             </ErrorBoundary>
           )}
 
-          {upcomingMovies.length > 0 && (
-            <ErrorBoundary fallback={<div className="text-center text-gray-400 py-8">Failed to load upcoming movies</div>}>
-              <ContentSection
-                title="Coming Soon"
-                items={upcomingMovies.slice(0, 20)}
-                viewAllHref="/movies?sort=upcoming"
-              />
-            </ErrorBoundary>
-          )}
-
           {popularMovies.length > 0 && (
-            <ErrorBoundary fallback={<div className="text-center text-gray-400 py-8">Failed to load popular movies</div>}>
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load popular movies</div>}>
               <ContentSection
+                sectionId="popular-movies-section"
                 title="Popular Movies"
+                subtitle="Fan favourites heating up right now."
+                icon="PM"
                 items={popularMovies.slice(0, 20)}
                 viewAllHref="/movies"
               />
@@ -157,9 +163,12 @@ export default async function HomePage() {
           )}
 
           {popularTV.length > 0 && (
-            <ErrorBoundary fallback={<div className="text-center text-gray-400 py-8">Failed to load popular TV shows</div>}>
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load popular TV shows</div>}>
               <ContentSection
+                sectionId="popular-tv-section"
                 title="Popular TV Shows"
+                subtitle="Series viewers keep returning to."
+                icon="TV"
                 items={popularTV.slice(0, 20)}
                 viewAllHref="/tv"
               />
@@ -167,9 +176,12 @@ export default async function HomePage() {
           )}
 
           {topRatedMovies.length > 0 && (
-            <ErrorBoundary fallback={<div className="text-center text-gray-400 py-8">Failed to load top rated movies</div>}>
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load top rated movies</div>}>
               <ContentSection
+                sectionId="top-rated-movies-section"
                 title="Top Rated Movies"
+                subtitle="Critic-approved films worth your time."
+                icon="TR"
                 items={topRatedMovies.slice(0, 20)}
                 viewAllHref="/movies?sort=rating"
               />
@@ -177,29 +189,45 @@ export default async function HomePage() {
           )}
 
           {topRatedTV.length > 0 && (
-            <ErrorBoundary fallback={<div className="text-center text-gray-400 py-8">Failed to load top rated TV shows</div>}>
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load top rated TV shows</div>}>
               <ContentSection
+                sectionId="top-rated-tv-section"
                 title="Top Rated TV Shows"
+                subtitle="Acclaimed series with standout seasons."
+                icon="AT"
                 items={topRatedTV.slice(0, 20)}
                 viewAllHref="/tv?sort=rating"
               />
             </ErrorBoundary>
           )}
 
+          {upcomingMovies.length > 0 && (
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load upcoming movies</div>}>
+              <ContentSection
+                sectionId="coming-soon-section"
+                title="Coming Soon"
+                subtitle="Set reminders for the next wave of releases."
+                icon="CS"
+                items={upcomingMovies.slice(0, 20)}
+                viewAllHref="/movies?sort=upcoming"
+              />
+            </ErrorBoundary>
+          )}
+
           {allEmpty && (
-            <div className="container mx-auto px-6 py-16">
-              <div className="rounded-2xl border border-gray-800 bg-gray-900/50 p-8 text-center">
-                <h2 className="text-2xl font-semibold text-white mb-2">No content loaded</h2>
-                <p className="text-gray-400 mb-4">Add your TMDB API credentials to .env.local and restart the dev server.</p>
-                <div className="text-left inline-block text-sm text-gray-300 bg-black/40 rounded-lg p-4 border border-gray-800">
-                  <pre>{`# .env.local
+            <div className="rounded-2xl border border-gray-800 bg-gray-900/50 p-8 text-center">
+              <h2 className="mb-2 text-2xl font-semibold text-white">Content is warming up</h2>
+              <p className="mb-4 text-gray-400">
+                Add your TMDB API credentials to .env.local and restart the dev server to unlock live data feeds.
+              </p>
+              <div className="inline-block rounded-lg border border-gray-800 bg-black/40 p-4 text-left text-sm text-gray-300">
+                <pre>{`# .env.local
 TMDB_API_KEY=your_tmdb_api_key
 # or
 # TMDB_READ_TOKEN=your_tmdb_v4_bearer_token
 CACHE_TTL_SECONDS=300`}</pre>
-                </div>
-                <p className="text-gray-500 text-sm mt-4">Health: visit /api/health for status</p>
               </div>
+              <p className="mt-4 text-sm text-gray-500">Need help? Visit /api/health to confirm connectivity.</p>
             </div>
           )}
         </div>
@@ -209,4 +237,5 @@ CACHE_TTL_SECONDS=300`}</pre>
     </div>
   )
 }
+
 

@@ -53,7 +53,6 @@ export default function WatchTvEpisodeClient({
   servers
 }: Props) {
   const sortedEpisodes = useMemo(() => mapEpisodes(episodes), [episodes])
-
   const backdrop = details?.backdrop_path ? `https://image.tmdb.org/t/p/original${details.backdrop_path}` : null
   const poster = details?.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : FALLBACK_STILL
   const year = details?.first_air_date ? details.first_air_date.slice(0, 4) : undefined
@@ -63,6 +62,14 @@ export default function WatchTvEpisodeClient({
     () => sortedEpisodes.find((episode) => episode.episode_number === episodeNumber) || null,
     [sortedEpisodes, episodeNumber]
   )
+
+  const { previousEpisodeNumber, nextEpisodeNumber } = useMemo(() => {
+    const index = sortedEpisodes.findIndex((episode) => episode.episode_number === episodeNumber)
+    return {
+      previousEpisodeNumber: index > 0 ? sortedEpisodes[index - 1].episode_number : null,
+      nextEpisodeNumber: index >= 0 && index < sortedEpisodes.length - 1 ? sortedEpisodes[index + 1].episode_number : null
+    }
+  }, [sortedEpisodes, episodeNumber])
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -130,7 +137,36 @@ export default function WatchTvEpisodeClient({
                 <p className="max-w-3xl text-sm text-slate-300 md:text-base md:leading-relaxed">{details.overview}</p>
               )}
 
-              <PlayerEmbed initialServers={servers} />
+              <div className="space-y-3">
+                <PlayerEmbed initialServers={servers} />
+
+                <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.3em] text-slate-400">
+                  {previousEpisodeNumber ? (
+                    <Link
+                      href={`/watch/tv/${id}/${seasonNumber}/${previousEpisodeNumber}`}
+                      prefetch={false}
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/70 px-4 py-2 text-[11px] font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-white"
+                    >
+                      ← Episode {previousEpisodeNumber.toString().padStart(2, "0")}
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
+
+                  {nextEpisodeNumber ? (
+                    <Link
+                      href={`/watch/tv/${id}/${seasonNumber}/${nextEpisodeNumber}`}
+                      prefetch={false}
+                      className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 bg-slate-900/70 px-4 py-2 text-[11px] font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-white"
+                    >
+                      Episode {nextEpisodeNumber.toString().padStart(2, "0")}
+                      →
+                    </Link>
+                  ) : (
+                    <span />
+                  )}
+                </div>
+              </div>
 
               {seasons.length > 0 && (
                 <div className="rounded-2xl border border-slate-800/60 bg-slate-950/70 p-4">

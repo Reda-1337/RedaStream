@@ -180,8 +180,10 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
                       : null
                     const runtime = episode.runtime ? `${episode.runtime} min` : null
                     return (
-                      <div
-                        key={episode.id}
+                      <Link
+                        key={episode.id ?? `${episode.episode_number}`}
+                        prefetch={false}
+                        href={`/watch/tv/${params.id}/${currentSeasonNumber}/${episode.episode_number}`}
                         className="group flex gap-4 rounded-2xl border border-slate-800/50 bg-slate-950/70 p-4 transition hover:border-cyan-400/50 hover:bg-slate-950/80"
                       >
                         <div className="relative h-28 w-40 overflow-hidden rounded-xl bg-slate-900">
@@ -200,11 +202,20 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
                             <span className="font-semibold text-white">{episode.name}</span>
                             {runtime && <span>{runtime}</span>}
                           </div>
-                          {episode.overview && (
+                          {episode.overview ? (
                             <p className="text-xs text-slate-400 line-clamp-3">{episode.overview}</p>
+                          ) : (
+                            <p className="text-xs text-slate-500 italic">No description available.</p>
                           )}
+                          <div className="flex items-center justify-between text-[11px] uppercase tracking-[0.35em] text-cyan-200">
+                            <span>Air date: {episode.air_date ?? 'N/A'}</span>
+                            <span className="inline-flex items-center gap-2">
+                              <Play className="h-3 w-3" />
+                              Watch
+                            </span>
+                          </div>
                         </div>
-                      </div>
+                      </Link>
                     )
                   })}
                 </div>

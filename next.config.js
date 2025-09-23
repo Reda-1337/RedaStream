@@ -23,10 +23,17 @@ const DEFAULT_IFRAME_ORIGINS = [
   'https://autoembed.to',
   'https://*.autoembed.to',
   'https://cloudnestra.com',
-  'https://*.cloudnestra.com'
+  'https://*.cloudnestra.com',
+  'https://player.videasy.net'
 ].join(',')
 
 const nextConfig = {
+  webpack(config, { dev }) {
+    if (dev) {
+      config.cache = false
+    }
+    return config
+  },
   reactStrictMode: true,
   images: {
     remotePatterns: [

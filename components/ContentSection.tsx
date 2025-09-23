@@ -1,6 +1,6 @@
-"use client"
+﻿"use client"
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import MediaCard from './MediaCard'
 
@@ -21,23 +21,49 @@ type Props = {
   viewAllHref: string
   icon?: string
   subtitle?: string
+  sectionId?: string
 }
 
-export default function ContentSection({ title, items, viewAllHref, icon, subtitle }: Props) {
-  const [scrollPosition, setScrollPosition] = useState(0)
+export default function ContentSection({ title, items, viewAllHref, icon, subtitle, sectionId }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const updateScrollMetrics = useCallback(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+    setCanScrollLeft(container.scrollLeft > 8)
+    setCanScrollRight(container.scrollLeft + container.clientWidth < container.scrollWidth - 8)
+  }, [])
+
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    updateScrollMetrics()
+
+    const handleScroll = () => updateScrollMetrics()
+    const handleResize = () => updateScrollMetrics()
+
+    container.addEventListener('scroll', handleScroll)
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [updateScrollMetrics])
 
   if (items.length === 0) return null
 
   const scroll = (direction: 'left' | 'right') => {
-    if (!scrollContainerRef.current) return
-
     const container = scrollContainerRef.current
-    const scrollAmount = 420
-    const newPosition = direction === 'left' ? scrollPosition - scrollAmount : scrollPosition + scrollAmount
+    if (!container) return
 
-    container.scrollTo({ left: newPosition, behavior: 'smooth' })
-    setScrollPosition(newPosition)
+    const scrollAmount = Math.max(container.clientWidth * 0.8, 320)
+    const delta = direction === 'left' ? -scrollAmount : scrollAmount
+    container.scrollBy({ left: delta, behavior: 'smooth' })
+    window.setTimeout(updateScrollMetrics, 250)
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -46,7 +72,7 @@ export default function ContentSection({ title, items, viewAllHref, icon, subtit
   }
 
   return (
-    <section className="space-y-6">
+    <section id={sectionId ?? undefined} className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
@@ -65,12 +91,12 @@ export default function ContentSection({ title, items, viewAllHref, icon, subtit
           className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-slate-300 transition hover:border-cyan-400/60 hover:text-white"
         >
           View All
-          <span className="text-cyan-400">➜</span>
+          <span className="text-cyan-400">{'>'}</span>
         </Link>
       </div>
 
       <div className="relative">
-        {scrollPosition > 0 && (
+        {canScrollLeft && (
           <button
             type="button"
             onClick={() => scroll('left')}
@@ -82,15 +108,17 @@ export default function ContentSection({ title, items, viewAllHref, icon, subtit
           </button>
         )}
 
-        <button
-          type="button"
-          onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 z-20 -translate-y-1/2 rounded-full border border-slate-700/60 bg-slate-900/80 p-3 text-white shadow-[0_10px_30px_rgba(8,47,73,0.5)] transition hover:translate-x-1 hover:border-cyan-400/60"
-        >
-          <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+        {canScrollRight && (
+          <button
+            type="button"
+            onClick={() => scroll('right')}
+            className="absolute right-0 top-1/2 z-20 -translate-y-1/2 rounded-full border border-slate-700/60 bg-slate-900/80 p-3 text-white shadow-[0_10px_30px_rgba(8,47,73,0.5)] transition hover:translate-x-1 hover:border-cyan-400/60"
+          >
+            <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        )}
 
         <div
           ref={scrollContainerRef}
@@ -124,3 +152,4 @@ export default function ContentSection({ title, items, viewAllHref, icon, subtit
     </section>
   )
 }
+
