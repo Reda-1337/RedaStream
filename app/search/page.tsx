@@ -3,6 +3,7 @@ import EnhancedFooter from '@/components/EnhancedFooter'
 import MediaGrid from '@/components/MediaGrid'
 import { getBaseUrl } from '@/lib/baseUrl'
 import Link from 'next/link'
+import { FALLBACK_MOVIES, FALLBACK_TRENDING, FALLBACK_TV, FALLBACK_UPCOMING } from '@/components/home/fallbackData'
 
 type SearchResponse = {
   results: any[]
@@ -24,19 +25,29 @@ async function fetchResults(query: string, type: 'all' | 'movie' | 'tv', page: s
   const params = new URLSearchParams({ q: query, page })
   if (type !== 'all') params.set('type', type)
 
-  const res = await fetch(`${getBaseUrl()}/api/search?${params.toString()}`, {
-    next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 120) }
-  })
+  try {
+    const res = await fetch(`${getBaseUrl()}/api/search?${params.toString()}`, {
+      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 120) }
+    })
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return { results: [] } as SearchResponse
+    }
+
+    return res.json() as Promise<SearchResponse>
+  } catch (error) {
     return { results: [] } as SearchResponse
   }
-
-  return res.json() as Promise<SearchResponse>
 }
 
 type Props = {
   searchParams: { q?: string; type?: string; page?: string }
+}
+
+function buildFallbackResults(type: 'all' | 'movie' | 'tv') {
+  if (type === 'movie') return FALLBACK_MOVIES
+  if (type === 'tv') return FALLBACK_TV
+  return [...FALLBACK_TRENDING]
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -45,8 +56,12 @@ export default async function SearchPage({ searchParams }: Props) {
   const page = searchParams.page?.toString() ?? '1'
 
   const data = await fetchResults(query, typeParam, page)
-  const results = Array.isArray(data.results) ? data.results : []
+  let results = Array.isArray(data.results) ? data.results : []
   const totalResults = data.total_results ?? results.length
+
+  if (query && results.length === 0) {
+    results = buildFallbackResults(typeParam)
+  }
 
   return (
     <div className="min-h-screen">
@@ -65,9 +80,9 @@ export default async function SearchPage({ searchParams }: Props) {
               <Link
                 key={filter.value}
                 href={`/search?${params.toString()}`}
-                className={`rounded-full px-4 py-2 transition ${
+                className={`inline-flex flex-shrink-0 items-center gap-2 rounded-full border px-4 py-2 transition ${
                   isActive
-                    ? 'border border-cyan-400/60 bg-cyan-500/10 text-cyan-100 shadow-[0_12px_28px_rgba(6,182,212,0.35)]'
+                    ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-100 shadow-[0_12px_28px_rgba(6,182,212,0.35)]'
                     : 'border border-transparent bg-slate-900/70 text-slate-400 hover:border-slate-700/60 hover:text-white'
                 }`}
               >
