@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import FiltersBar from '@/components/FiltersBar'
+import { FALLBACK_TV } from '@/components/home/fallbackData'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import CatalogResults from '@/components/CatalogResults'
 import { fetchCatalogFilters, getLanguageLabel } from '@/lib/catalog'
@@ -132,7 +133,8 @@ export default async function TvPage({ searchParams }: { searchParams: SearchPar
   ])
 
   const items = Array.isArray(tvData.results) ? tvData.results : []
-  const totalResults = typeof tvData.total_results === 'number' ? tvData.total_results : items.length
+  const safeItems = items.length > 0 ? items : FALLBACK_TV
+  const totalResults = typeof tvData.total_results === 'number' ? tvData.total_results : safeItems.length
   const totalPages = typeof tvData.total_pages === 'number' ? tvData.total_pages : 1
 
   const sortValue = normalizedParams.get('sort_by') || 'popularity.desc'
@@ -163,7 +165,7 @@ export default async function TvPage({ searchParams }: { searchParams: SearchPar
     { label: 'Results', value: formatResultsCount(totalResults) }
   ]
 
-  const hasResults = items.length > 0
+  const hasResults = safeItems.length > 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black">
@@ -199,7 +201,7 @@ export default async function TvPage({ searchParams }: { searchParams: SearchPar
             <div className="rounded-3xl border border-slate-900/60 bg-slate-950/70 p-6 shadow-[0_12px_50px_rgba(17,24,39,0.35)]">
               <CatalogResults key={`tv-${queryString}-p${initialPage}`}
                 type="tv"
-                initialItems={items}
+                initialItems={safeItems}
                 initialPage={initialPage}
                 initialTotalPages={totalPages}
                 queryKey={`tv-${queryString}-p${initialPage}`}

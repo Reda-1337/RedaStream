@@ -13,7 +13,10 @@ import {
   FALLBACK_UPCOMING
 } from '@/components/home/fallbackData'
 
+const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
+
 async function getTrending() {
+  if (!HAS_TMDB_CREDS) return { results: FALLBACK_TRENDING }
   try {
     const res = await fetch(`${getBaseUrl()}/api/trending?media_type=all&time_window=week`, {
       next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
@@ -22,11 +25,12 @@ async function getTrending() {
     return res.json()
   } catch (error) {
     console.error('Error fetching trending data:', error)
-    return { results: [] as any[] }
+    return { results: FALLBACK_TRENDING }
   }
 }
 
 async function getPopularMovies() {
+  if (!HAS_TMDB_CREDS) return { results: FALLBACK_MOVIES }
   try {
     const res = await fetch(`${getBaseUrl()}/api/discover?type=movie&sort_by=popularity.desc&page=1`, {
       next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
@@ -35,11 +39,12 @@ async function getPopularMovies() {
     return res.json()
   } catch (error) {
     console.error('Error fetching popular movies:', error)
-    return { results: [] as any[] }
+    return { results: FALLBACK_MOVIES }
   }
 }
 
 async function getPopularTV() {
+  if (!HAS_TMDB_CREDS) return { results: FALLBACK_TV }
   try {
     const res = await fetch(`${getBaseUrl()}/api/discover?type=tv&sort_by=popularity.desc&page=1`, {
       next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
@@ -48,11 +53,12 @@ async function getPopularTV() {
     return res.json()
   } catch (error) {
     console.error('Error fetching popular TV:', error)
-    return { results: [] as any[] }
+    return { results: FALLBACK_TV }
   }
 }
 
 async function getTopRatedMovies() {
+  if (!HAS_TMDB_CREDS) return { results: FALLBACK_MOVIES }
   try {
     const res = await fetch(`${getBaseUrl()}/api/discover?type=movie&sort_by=vote_average.desc&page=1`, {
       next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
@@ -61,11 +67,12 @@ async function getTopRatedMovies() {
     return res.json()
   } catch (error) {
     console.error('Error fetching top rated movies:', error)
-    return { results: [] as any[] }
+    return { results: FALLBACK_MOVIES }
   }
 }
 
 async function getTopRatedTV() {
+  if (!HAS_TMDB_CREDS) return { results: FALLBACK_TV }
   try {
     const res = await fetch(`${getBaseUrl()}/api/discover?type=tv&sort_by=vote_average.desc&page=1`, {
       next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
@@ -74,11 +81,12 @@ async function getTopRatedTV() {
     return res.json()
   } catch (error) {
     console.error('Error fetching top rated TV:', error)
-    return { results: [] as any[] }
+    return { results: FALLBACK_TV }
   }
 }
 
 async function getUpcomingMovies() {
+  if (!HAS_TMDB_CREDS) return { results: FALLBACK_UPCOMING }
   try {
     const res = await fetch(`${getBaseUrl()}/api/discover?type=movie&sort_by=release_date.desc&page=1`, {
       next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
@@ -87,14 +95,12 @@ async function getUpcomingMovies() {
     return res.json()
   } catch (error) {
     console.error('Error fetching upcoming movies:', error)
-    return { results: [] as any[] }
+    return { results: FALLBACK_UPCOMING }
   }
 }
 
-function withFallback<T extends { results?: any[] }>(data: T | null | undefined, fallback: any[]) {
-  if (!data || !Array.isArray(data.results) || data.results.length === 0) {
-    return fallback
-  }
+function unwrapResults<T extends { results?: any[] }>(data: T | null | undefined) {
+  if (!data || !Array.isArray(data.results)) return []
   return data.results
 }
 
@@ -108,12 +114,12 @@ export default async function HomePage() {
     getUpcomingMovies()
   ])
 
-  const trendingItems = withFallback(trendingData, FALLBACK_TRENDING)
-  const popularMovies = withFallback(popularMoviesData, FALLBACK_MOVIES)
-  const popularTV = withFallback(popularTVData, FALLBACK_TV)
-  const topRatedMovies = withFallback(topRatedMoviesData, FALLBACK_MOVIES)
-  const topRatedTV = withFallback(topRatedTVData, FALLBACK_TV)
-  const upcomingMovies = withFallback(upcomingMoviesData, FALLBACK_UPCOMING)
+  const trendingItems = unwrapResults(trendingData)
+  const popularMovies = unwrapResults(popularMoviesData)
+  const popularTV = unwrapResults(popularTVData)
+  const topRatedMovies = unwrapResults(topRatedMoviesData)
+  const topRatedTV = unwrapResults(topRatedTVData)
+  const upcomingMovies = unwrapResults(upcomingMoviesData)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black">

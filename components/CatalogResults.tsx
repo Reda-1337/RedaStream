@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MediaGrid from './MediaGrid'
 import LoadingSkeleton from './LoadingSkeleton'
+import { FALLBACK_MOVIES, FALLBACK_TV } from './home/fallbackData'
 
 type CatalogItem = {
   id: number
@@ -26,110 +27,20 @@ type Props = {
 
 const LOADING_FALLBACK_COUNT = 6
 const FALLBACK_TOTAL_PAGES = 5
+const HAS_TMDB_CREDS = Boolean(process.env.NEXT_PUBLIC_TMDB_ENABLED) ? true : Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
 
-const FALLBACK_LIBRARY: Record<'movie' | 'tv', Array<Omit<CatalogItem, 'id'>>> = {
-  movie: [
-    {
-      title: 'Inception',
-      poster_path: '/qmDpIHrmpJINaRKAfWQfftjCdyi.jpg',
-      release_date: '2010-07-16',
-      vote_average: 8.4,
-      media_type: 'movie'
-    },
-    {
-      title: 'Interstellar',
-      poster_path: '/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-      release_date: '2014-11-07',
-      vote_average: 8.3,
-      media_type: 'movie'
-    },
-    {
-      title: 'The Dark Knight',
-      poster_path: '/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
-      release_date: '2008-07-16',
-      vote_average: 8.5,
-      media_type: 'movie'
-    },
-    {
-      title: 'Dune: Part Two',
-      poster_path: '/dGu302NaCTP6aRICUyllRWWDt9G.jpg',
-      release_date: '2024-03-01',
-      vote_average: 8.3,
-      media_type: 'movie'
-    },
-    {
-      title: 'The Matrix',
-      poster_path: '/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg',
-      release_date: '1999-03-31',
-      vote_average: 8.2,
-      media_type: 'movie'
-    },
-    {
-      title: 'Blade Runner 2049',
-      poster_path: '/aMpyrCizvSdc0UIMblJ1srVgAEF.jpg',
-      release_date: '2017-10-04',
-      vote_average: 7.6,
-      media_type: 'movie'
-    }
-  ],
-  tv: [
-    {
-      name: 'Stranger Things',
-      poster_path: '/49WJfeN0moxb9IPfGn8AIqMGskD.jpg',
-      first_air_date: '2016-07-15',
-      vote_average: 8.6,
-      media_type: 'tv'
-    },
-    {
-      name: 'The Boys',
-      poster_path: '/mY7SeH4HFFxW1hiI6cWuwCRKptN.jpg',
-      first_air_date: '2019-07-25',
-      vote_average: 8.5,
-      media_type: 'tv'
-    },
-    {
-      name: 'House of the Dragon',
-      poster_path: '/1X4h40fcB4WWUmIBK0auT4zRBAV.jpg',
-      first_air_date: '2022-08-21',
-      vote_average: 8.4,
-      media_type: 'tv'
-    },
-    {
-      name: 'The Last of Us',
-      poster_path: '/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg',
-      first_air_date: '2023-01-15',
-      vote_average: 8.6,
-      media_type: 'tv'
-    },
-    {
-      name: 'Loki',
-      poster_path: '/kEl2t3OhXc3Zb9FBh1AuYzRTgZp.jpg',
-      first_air_date: '2021-06-09',
-      vote_average: 8.1,
-      media_type: 'tv'
-    },
-    {
-      name: 'Breaking Bad',
-      poster_path: '/ggFHVNu6YYI5L9pCfOacjizRGt.jpg',
-      first_air_date: '2008-01-20',
-      vote_average: 8.9,
-      media_type: 'tv'
-    }
-  ]
+const FALLBACK_LIBRARY: Record<'movie' | 'tv', CatalogItem[]> = {
+  movie: FALLBACK_MOVIES,
+  tv: FALLBACK_TV
 }
 
 function buildFallbackPage(type: 'movie' | 'tv', page: number) {
   const base = FALLBACK_LIBRARY[type]
-  const results = base.map((item, index) => ({
+  return base.map((item, index) => ({
     ...item,
     id: (page + 1) * 1000 + index,
-    media_type: item.media_type
+    media_type: type
   }))
-
-  return {
-    results,
-    totalPages: FALLBACK_TOTAL_PAGES
-  }
 }
 
 export default function CatalogResults({
@@ -147,23 +58,20 @@ export default function CatalogResults({
   const [page, setPage] = useState(normalizedInitialPage)
   const [maxPages, setMaxPages] = useState(normalizedInitialTotal)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     setItems(initialItems ?? [])
     setPage(normalizedInitialPage)
     setMaxPages(normalizedInitialTotal)
-    setError(null)
   }, [initialItems, normalizedInitialPage, normalizedInitialTotal, queryKey])
 
   const hasMore = useMemo(() => page < maxPages, [page, maxPages])
 
-  const appendItems = useCallback((nextItems: CatalogItem[], nextPage: number, incomingTotalPages: number, fallback = false) => {
+  const appendItems = useCallback((nextItems: CatalogItem[], nextPage: number, incomingTotalPages: number) => {
     setItems((prev) => [...prev, ...nextItems])
     setPage(nextPage)
     setMaxPages(incomingTotalPages)
-    setError(fallback ? 'Showing demo results due to API limits.' : null)
   }, [])
 
   const loadNextPage = useCallback(async () => {
@@ -172,8 +80,14 @@ export default function CatalogResults({
     const nextPage = page + 1
 
     const handleFallback = () => {
-      const fallback = buildFallbackPage(type, nextPage)
-      appendItems(fallback.results, Math.min(nextPage, fallback.totalPages), fallback.totalPages, true)
+      const fallbackItems = buildFallbackPage(type, nextPage)
+      appendItems(fallbackItems, Math.min(nextPage, FALLBACK_TOTAL_PAGES), FALLBACK_TOTAL_PAGES)
+    }
+
+    if (!HAS_TMDB_CREDS) {
+      handleFallback()
+      setIsLoading(false)
+      return
     }
 
     try {
@@ -249,12 +163,6 @@ export default function CatalogResults({
         {isLoading && (
           <div className="w-full">
             <LoadingSkeleton type="grid" count={LOADING_FALLBACK_COUNT} />
-          </div>
-        )}
-
-        {error && (
-          <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-200">
-            {error}
           </div>
         )}
 

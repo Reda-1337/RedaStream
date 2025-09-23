@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import FiltersBar from '@/components/FiltersBar'
+import { FALLBACK_MOVIES } from '@/components/home/fallbackData'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import CatalogResults from '@/components/CatalogResults'
 import { fetchCatalogFilters, getLanguageLabel } from '@/lib/catalog'
@@ -131,7 +132,8 @@ export default async function MoviesPage({ searchParams }: { searchParams: Searc
   ])
 
   const items = Array.isArray(movieData.results) ? movieData.results : []
-  const totalResults = typeof movieData.total_results === 'number' ? movieData.total_results : items.length
+  const safeItems = items.length > 0 ? items : FALLBACK_MOVIES
+  const totalResults = typeof movieData.total_results === 'number' ? movieData.total_results : safeItems.length
   const totalPages = typeof movieData.total_pages === 'number' ? movieData.total_pages : 1
 
   const sortValue = normalizedParams.get('sort_by') || 'popularity.desc'
@@ -162,7 +164,7 @@ export default async function MoviesPage({ searchParams }: { searchParams: Searc
     { label: 'Results', value: formatResultsCount(totalResults) }
   ]
 
-  const hasResults = items.length > 0
+  const hasResults = safeItems.length > 0
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-slate-950 to-black">
@@ -198,7 +200,7 @@ export default async function MoviesPage({ searchParams }: { searchParams: Searc
             <div className="rounded-3xl border border-slate-900/60 bg-slate-950/70 p-6 shadow-[0_12px_50px_rgba(7,16,45,0.35)]">
               <CatalogResults key={`movie-${queryString}-p${initialPage}`}
                 type="movie"
-                initialItems={items}
+                initialItems={safeItems}
                 initialPage={initialPage}
                 initialTotalPages={totalPages}
                 queryKey={`movie-${queryString}-p${initialPage}`}

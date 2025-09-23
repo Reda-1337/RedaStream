@@ -3,7 +3,7 @@ import EnhancedFooter from '@/components/EnhancedFooter'
 import MediaGrid from '@/components/MediaGrid'
 import { getBaseUrl } from '@/lib/baseUrl'
 import Link from 'next/link'
-import { FALLBACK_MOVIES, FALLBACK_TRENDING, FALLBACK_TV, FALLBACK_UPCOMING } from '@/components/home/fallbackData'
+import { FALLBACK_MOVIES, FALLBACK_TRENDING, FALLBACK_TV } from '@/components/home/fallbackData'
 
 type SearchResponse = {
   results: any[]
@@ -17,9 +17,15 @@ const filters = [
   { label: 'TV Series', value: 'tv' }
 ]
 
+const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
+
 async function fetchResults(query: string, type: 'all' | 'movie' | 'tv', page: string) {
   if (!query || query.trim().length < 2) {
     return { results: [] } as SearchResponse
+  }
+
+  if (!HAS_TMDB_CREDS) {
+    return { results: buildFallbackResults(type) }
   }
 
   const params = new URLSearchParams({ q: query, page })
@@ -31,12 +37,13 @@ async function fetchResults(query: string, type: 'all' | 'movie' | 'tv', page: s
     })
 
     if (!res.ok) {
-      return { results: [] } as SearchResponse
+      return { results: buildFallbackResults(type) }
     }
 
     return res.json() as Promise<SearchResponse>
   } catch (error) {
-    return { results: [] } as SearchResponse
+    console.error('Error searching TMDB:', error)
+    return { results: buildFallbackResults(type) }
   }
 }
 
@@ -47,7 +54,7 @@ type Props = {
 function buildFallbackResults(type: 'all' | 'movie' | 'tv') {
   if (type === 'movie') return FALLBACK_MOVIES
   if (type === 'tv') return FALLBACK_TV
-  return [...FALLBACK_TRENDING]
+  return FALLBACK_TRENDING
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -56,12 +63,8 @@ export default async function SearchPage({ searchParams }: Props) {
   const page = searchParams.page?.toString() ?? '1'
 
   const data = await fetchResults(query, typeParam, page)
-  let results = Array.isArray(data.results) ? data.results : []
+  const results = Array.isArray(data.results) ? data.results : []
   const totalResults = data.total_results ?? results.length
-
-  if (query && results.length === 0) {
-    results = buildFallbackResults(typeParam)
-  }
 
   return (
     <div className="min-h-screen">

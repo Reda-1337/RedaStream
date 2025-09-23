@@ -3,12 +3,12 @@
     id: 10001,
     title: 'Dune: Part Two',
     overview:
-      'Paul Atreides unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family.',
+      "Paul Atreides unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family.",
     poster_path: '/dGu302NaCTP6aRICUyllRWWDt9G.jpg',
     backdrop_path: '/1Z1Z1g9XxZMEYqgkZ7Z2u7FZ3FD.jpg',
     release_date: '2024-03-01',
     vote_average: 8.3,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 10002,
@@ -19,7 +19,7 @@
     backdrop_path: '/bz66a19bR6BKsbY8gSZCM4VNh8m.jpg',
     release_date: '2023-05-31',
     vote_average: 8.4,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 10003,
@@ -30,7 +30,7 @@
     backdrop_path: '/p4Qf2x8VIflogjQUBYgmT0tG5Mb.jpg',
     first_air_date: '2023-01-15',
     vote_average: 8.6,
-    media_type: 'tv'
+    media_type: 'tv' as const
   },
   {
     id: 10004,
@@ -41,7 +41,7 @@
     backdrop_path: '/qD0QdbEzpylOnctEXgQZQCE1YtY.jpg',
     release_date: '2023-07-19',
     vote_average: 8.1,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 10005,
@@ -52,7 +52,7 @@
     backdrop_path: '/56v2KjBlU4XaOv9rVYEQypROD7P.jpg',
     first_air_date: '2016-07-15',
     vote_average: 8.6,
-    media_type: 'tv'
+    media_type: 'tv' as const
   },
   {
     id: 10006,
@@ -63,7 +63,7 @@
     backdrop_path: '/f6r8Cqe7YCOEipppe4fYwdr1XbS.jpg',
     release_date: '2023-07-08',
     vote_average: 7.5,
-    media_type: 'movie'
+    media_type: 'movie' as const
   }
 ]
 
@@ -74,7 +74,7 @@ export const FALLBACK_MOVIES = [
     poster_path: '/r2J02Z2OpNTctfOSN1Ydgii51I3.jpg',
     release_date: '2023-05-03',
     vote_average: 7.9,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 20002,
@@ -82,7 +82,7 @@ export const FALLBACK_MOVIES = [
     poster_path: '/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg',
     release_date: '2023-03-22',
     vote_average: 7.8,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 20003,
@@ -90,7 +90,7 @@ export const FALLBACK_MOVIES = [
     poster_path: '/62HCnUTziyWcpDaBO2i1DX17ljH.jpg',
     release_date: '2022-05-24',
     vote_average: 8.1,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 20004,
@@ -98,7 +98,7 @@ export const FALLBACK_MOVIES = [
     poster_path: '/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg',
     release_date: '2023-07-19',
     vote_average: 7.1,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 20005,
@@ -106,7 +106,7 @@ export const FALLBACK_MOVIES = [
     poster_path: '/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg',
     release_date: '2022-12-14',
     vote_average: 7.6,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 20006,
@@ -114,7 +114,7 @@ export const FALLBACK_MOVIES = [
     poster_path: '/sv1xJUazXeYqALzczSZ3O6nkH75.jpg',
     release_date: '2022-11-09',
     vote_average: 7.3,
-    media_type: 'movie'
+    media_type: 'movie' as const
   }
 ]
 
@@ -125,7 +125,7 @@ export const FALLBACK_TV = [
     poster_path: '/1X4h40fcB4WWUmIBK0auT4zRBAV.jpg',
     first_air_date: '2022-08-21',
     vote_average: 8.4,
-    media_type: 'tv'
+    media_type: 'tv' as const
   },
   {
     id: 30002,
@@ -133,7 +133,7 @@ export const FALLBACK_TV = [
     poster_path: '/mY7SeH4HFFxW1hiI6cWuwCRKptN.jpg',
     first_air_date: '2019-07-25',
     vote_average: 8.5,
-    media_type: 'tv'
+    media_type: 'tv' as const
   },
   {
     id: 30003,
@@ -141,7 +141,7 @@ export const FALLBACK_TV = [
     poster_path: '/kEl2t3OhXc3Zb9FBh1AuYzRTgZp.jpg',
     first_air_date: '2021-06-09',
     vote_average: 8.1,
-    media_type: 'tv'
+    media_type: 'tv' as const
   },
   {
     id: 30004,
@@ -149,7 +149,7 @@ export const FALLBACK_TV = [
     poster_path: '/ggFHVNu6YYI5L9pCfOacjizRGt.jpg',
     first_air_date: '2008-01-20',
     vote_average: 8.9,
-    media_type: 'tv'
+    media_type: 'tv' as const
   },
   {
     id: 30005,
@@ -157,7 +157,7 @@ export const FALLBACK_TV = [
     poster_path: '/7coW1Mgoc8dr4FQezAr6ij4ujMt.jpg',
     first_air_date: '2018-06-03',
     vote_average: 8.3,
-    media_type: 'tv'
+    media_type: 'tv' as const
   },
   {
     id: 30006,
@@ -165,7 +165,7 @@ export const FALLBACK_TV = [
     poster_path: '/eU1i6eHXlzMOlEq0ku1Rzq7Y4wA.jpg',
     first_air_date: '2019-11-12',
     vote_average: 8.4,
-    media_type: 'tv'
+    media_type: 'tv' as const
   }
 ]
 
@@ -176,7 +176,7 @@ export const FALLBACK_UPCOMING = [
     poster_path: '/ztmYd9GArdFXG7wyOy7f1HwYQmo.jpg',
     release_date: '2024-06-14',
     vote_average: 0,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 40002,
@@ -184,7 +184,7 @@ export const FALLBACK_UPCOMING = [
     poster_path: '/f7q8v7uu1ZeELS2ZEkJjM2IJ9hJ.jpg',
     release_date: '2024-07-26',
     vote_average: 0,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 40003,
@@ -192,7 +192,7 @@ export const FALLBACK_UPCOMING = [
     poster_path: '/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg',
     release_date: '2024-10-04',
     vote_average: 0,
-    media_type: 'movie'
+    media_type: 'movie' as const
   },
   {
     id: 40004,
@@ -200,6 +200,6 @@ export const FALLBACK_UPCOMING = [
     poster_path: '/8rnLEeAyD8Ke87sR8Ryc8lr0VL5.jpg',
     release_date: '2023-11-10',
     vote_average: 6.2,
-    media_type: 'movie'
+    media_type: 'movie' as const
   }
 ]
