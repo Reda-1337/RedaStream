@@ -6,12 +6,25 @@ import MediaGrid from '@/components/MediaGrid'
 import { tmdbFetch } from '@/lib/tmdb'
 import { Play, Clock, Star, Calendar } from 'lucide-react'
 
+type MovieDetails = {
+  backdrop_path?: string | null
+  poster_path?: string | null
+  release_date?: string | null
+  runtime?: number | null
+  vote_average?: number | null
+  genres?: Array<{ id: number; name: string }>
+  recommendations?: { results?: any[] }
+  title?: string
+  tagline?: string | null
+  overview?: string | null
+}
+
 const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
 
-async function getDetails(id: string) {
+async function getDetails(id: string): Promise<MovieDetails | null> {
   if (!HAS_TMDB_CREDS) return null
   try {
-    return await tmdbFetch(`/movie/${id}`, {
+    return await tmdbFetch<MovieDetails>(`/movie/${id}`, {
       append_to_response: 'videos,images,credits,recommendations,release_dates,content_ratings,external_ids'
     })
   } catch (error) {
@@ -43,6 +56,7 @@ export default async function MovieDetailsPage({ params }: MoviePageProps) {
     )
   }
 
+  const title = data.title || 'Movie'
   const backdrop = data.backdrop_path ? `https://image.tmdb.org/t/p/original${data.backdrop_path}` : null
   const poster = data.poster_path ? `https://image.tmdb.org/t/p/w500${data.poster_path}` : null
   const watchHref = `/watch/movie/${params.id}`
@@ -62,7 +76,7 @@ export default async function MovieDetailsPage({ params }: MoviePageProps) {
             {backdrop ? (
               <Image
                 src={backdrop}
-                alt={data.title}
+                alt={title}
                 fill
                 priority
                 className="object-cover"
@@ -78,7 +92,7 @@ export default async function MovieDetailsPage({ params }: MoviePageProps) {
             <div className="glass-card w-full max-w-sm overflow-hidden rounded-[28px] border border-slate-800/50">
               <div className="relative aspect-[2/3]">
                 {poster ? (
-                  <Image src={poster} alt={data.title} fill className="object-cover" priority />
+                  <Image src={poster} alt={title} fill className="object-cover" priority />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-slate-900 text-slate-500">No Poster</div>
                 )}

@@ -8,12 +8,25 @@ import MediaGrid from "@/components/MediaGrid"
 import { tmdbFetch } from "@/lib/tmdb"
 import { getMovieServers } from "@/lib/streaming"
 
+type MovieDetails = {
+  backdrop_path?: string | null
+  poster_path?: string | null
+  release_date?: string | null
+  runtime?: number | null
+  vote_average?: number | null
+  genres?: Array<{ id: number; name: string }>
+  recommendations?: { results?: any[] }
+  title?: string
+  tagline?: string | null
+  overview?: string | null
+}
+
 const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
 
-async function getMovieDetails(id: string) {
+async function getMovieDetails(id: string): Promise<MovieDetails | null> {
   if (!HAS_TMDB_CREDS) return null
   try {
-    return await tmdbFetch(`/movie/${id}`, {
+    return await tmdbFetch<MovieDetails>(`/movie/${id}`, {
       append_to_response: 'videos,images,credits,recommendations,release_dates,content_ratings,external_ids'
     })
   } catch (error) {
@@ -27,6 +40,7 @@ const FALLBACK_POSTER = "https://image.tmdb.org/t/p/w500/xJHokMbljvjADYdit5fK5VQ
 export default async function WatchMoviePage({ params }: { params: { id: string } }) {
   const details = await getMovieDetails(params.id)
   const normalizedServers = getMovieServers(params.id)
+  const title = details?.title ?? 'Movie'
 
   const recommendations = Array.isArray(details?.recommendations?.results) ? details.recommendations.results : []
   const backdrop = details?.backdrop_path ? `https://image.tmdb.org/t/p/original${details.backdrop_path}` : null
@@ -42,7 +56,7 @@ export default async function WatchMoviePage({ params }: { params: { id: string 
 
       <section className="relative overflow-hidden">
         {backdrop ? (
-          <Image src={backdrop} alt={details?.title ?? "Movie background"} fill priority className="object-cover" />
+          <Image src={backdrop} alt={title} fill priority className="object-cover" />
         ) : (
           <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950" />
         )}
@@ -54,7 +68,7 @@ export default async function WatchMoviePage({ params }: { params: { id: string 
             <div className="overflow-hidden rounded-[28px] border border-slate-800/60 shadow-[0_25px_60px_rgba(8,47,73,0.45)]">
               <Image
                 src={poster || FALLBACK_POSTER}
-                alt={details?.title ?? "Movie poster"}
+                alt={title}
                 width={500}
                 height={750}
                 className="h-full w-full object-cover"
@@ -83,7 +97,7 @@ export default async function WatchMoviePage({ params }: { params: { id: string 
             <div className="glass-panel rounded-[32px] border border-slate-800/60 bg-slate-950/80 p-6">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <h1 className="text-3xl font-bold text-white md:text-4xl">{details?.title ?? "Watch Movie"}</h1>
+                  <h1 className="text-3xl font-bold text-white md:text-4xl">{title}</h1>
                   {details?.tagline && <p className="mt-2 text-sm italic text-slate-400">"{details.tagline}"</p>}
                 </div>
                 <Link

@@ -2,6 +2,19 @@ import { tmdbFetch } from "@/lib/tmdb"
 import { getTvServers } from "@/lib/streaming"
 import WatchTvEpisodeClient from "./WatchTvEpisodeClient"
 
+type TvDetails = {
+  backdrop_path?: string | null
+  poster_path?: string | null
+  first_air_date?: string | null
+  vote_average?: number | null
+  genres?: Array<{ id: number; name: string }>
+  seasons?: Array<{ season_number: number; name?: string; episode_count?: number }>
+  recommendations?: { results?: any[] }
+  name?: string
+  tagline?: string | null
+  overview?: string | null
+}
+
 type RouteParams = {
   id: string
   season: string
@@ -12,6 +25,11 @@ type SeasonSummary = {
   season_number: number
   name: string
   episode_count?: number
+}
+
+type SeasonDetails = {
+  episodes?: Array<{ episode_number: number; name?: string; overview?: string; still_path?: string | null; runtime?: number | null; air_date?: string | null }>
+  air_date?: string | null
 }
 
 type EpisodeSummary = {
@@ -25,10 +43,10 @@ type EpisodeSummary = {
 
 const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
 
-async function getTvDetails(id: string) {
+async function getTvDetails(id: string): Promise<TvDetails | null> {
   if (!HAS_TMDB_CREDS) return null
   try {
-    return await tmdbFetch(`/tv/${id}`, {
+    return await tmdbFetch<TvDetails>(`/tv/${id}`, {
       append_to_response: 'videos,images,credits,recommendations,content_ratings,external_ids'
     })
   } catch (error) {
@@ -37,10 +55,10 @@ async function getTvDetails(id: string) {
   }
 }
 
-async function getSeasonDetails(id: string, seasonNumber: number) {
+async function getSeasonDetails(id: string, seasonNumber: number): Promise<SeasonDetails | null> {
   if (!HAS_TMDB_CREDS) return null
   try {
-    return await tmdbFetch(`/tv/${id}/season/${seasonNumber}`)
+    return await tmdbFetch<SeasonDetails>(`/tv/${id}/season/${seasonNumber}`)
   } catch (error) {
     console.error(`Failed to load tv show ${id} season ${seasonNumber}:`, error)
     return null
@@ -57,6 +75,7 @@ export default async function WatchTvEpisodePage({ params }: { params: RoutePara
     getSeasonDetails(id, seasonNumber)
   ])
 
+  const showName = details?.name ?? 'TV Series'
   const seasons: SeasonSummary[] = Array.isArray(details?.seasons)
     ? details.seasons
         .filter((season: any) => typeof season?.season_number === "number" && season.season_number > 0)

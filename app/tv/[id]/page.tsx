@@ -7,14 +7,34 @@ import MediaGrid from '@/components/MediaGrid'
 
 import { Play, Calendar, ListVideo, Star } from 'lucide-react'
 
+type TvDetails = {
+  backdrop_path?: string | null
+  poster_path?: string | null
+  first_air_date?: string | null
+  vote_average?: number | null
+  genres?: Array<{ id: number; name: string }>
+  seasons?: Array<{ season_number: number; name?: string; episode_count?: number }>
+  number_of_seasons?: number | null
+  number_of_episodes?: number | null
+  recommendations?: { results?: any[] }
+  name?: string
+  tagline?: string | null
+  overview?: string | null
+}
+
+type SeasonDetails = {
+  episodes?: Array<{ episode_number: number; name?: string; overview?: string; still_path?: string | null; runtime?: number | null; air_date?: string | null }>
+  air_date?: string | null
+}
+
 const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
 
 
 
-async function getDetails(id: string) {
+async function getDetails(id: string): Promise<TvDetails | null> {
   if (!HAS_TMDB_CREDS) return null
   try {
-    return await tmdbFetch(`/tv/${id}`, {
+    return await tmdbFetch<TvDetails>(`/tv/${id}`, {
       append_to_response: 'videos,images,credits,recommendations,release_dates,content_ratings,external_ids'
     })
   } catch (error) {
@@ -23,10 +43,10 @@ async function getDetails(id: string) {
   }
 }
 
-async function getSeason(id: string, seasonNumber: number) {
+async function getSeason(id: string, seasonNumber: number): Promise<SeasonDetails | null> {
   if (!HAS_TMDB_CREDS) return null
   try {
-    return await tmdbFetch(`/tv/${id}/season/${seasonNumber}`)
+    return await tmdbFetch<SeasonDetails>(`/tv/${id}/season/${seasonNumber}`)
   } catch (error) {
     console.error(`Failed to load tv show ${id} season ${seasonNumber}:`, error)
     return null
@@ -57,6 +77,7 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
     )
   }
 
+  const seriesName = data.name || 'TV Series'
   const seasons = Array.isArray(data.seasons) ? data.seasons.filter((s: any) => s.season_number >= 0) : []
   const validSeasonNumbers = seasons.map((season: any) => season.season_number)
   const defaultSeason = validSeasonNumbers.find((n: number) => n > 0) ?? validSeasonNumbers[0] ?? 1
@@ -82,7 +103,7 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
         <section className="relative">
           <div className="absolute inset-0">
             {backdrop ? (
-              <Image src={backdrop} alt={data.name} fill priority className="object-cover" />
+              <Image src={backdrop} alt={seriesName} fill priority className="object-cover" />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-slate-900 via-slate-950 to-slate-950" />
             )}
@@ -94,7 +115,7 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
             <div className="glass-card w-full max-w-sm overflow-hidden rounded-[28px] border border-slate-800/50">
               <div className="relative aspect-[2/3]">
                 {poster ? (
-                  <Image src={poster} alt={data.name} fill className="object-cover" priority />
+                  <Image src={poster} alt={seriesName} fill className="object-cover" priority />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-slate-900 text-slate-500">No Poster</div>
                 )}
