@@ -1,10 +1,10 @@
-﻿import Header from '@/components/Header'
+import Header from '@/components/Header'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import EnhancedHeroSection from '@/components/EnhancedHeroSection'
 import ContentSection from '@/components/ContentSection'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import ErrorBoundary from '@/components/ErrorBoundary'
-import { getBaseUrl } from '@/lib/baseUrl'
+import { tmdbFetch } from '@/lib/tmdb'
 import { Suspense } from 'react'
 import {
   FALLBACK_MOVIES,
@@ -18,11 +18,7 @@ const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ
 async function getTrending() {
   if (!HAS_TMDB_CREDS) return { results: FALLBACK_TRENDING }
   try {
-    const res = await fetch(`${getBaseUrl()}/api/trending?media_type=all&time_window=week`, {
-      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
-    })
-    if (!res.ok) throw new Error(`Trending API failed: ${res.status}`)
-    return res.json()
+    return await tmdbFetch<{ results?: any[] }>('/trending/all/week', { page: '1' })
   } catch (error) {
     console.error('Error fetching trending data:', error)
     return { results: FALLBACK_TRENDING }
@@ -32,11 +28,10 @@ async function getTrending() {
 async function getPopularMovies() {
   if (!HAS_TMDB_CREDS) return { results: FALLBACK_MOVIES }
   try {
-    const res = await fetch(`${getBaseUrl()}/api/discover?type=movie&sort_by=popularity.desc&page=1`, {
-      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
+    return await tmdbFetch<{ results?: any[] }>('/discover/movie', {
+      sort_by: 'popularity.desc',
+      page: '1'
     })
-    if (!res.ok) throw new Error(`Popular Movies API failed: ${res.status}`)
-    return res.json()
   } catch (error) {
     console.error('Error fetching popular movies:', error)
     return { results: FALLBACK_MOVIES }
@@ -46,11 +41,10 @@ async function getPopularMovies() {
 async function getPopularTV() {
   if (!HAS_TMDB_CREDS) return { results: FALLBACK_TV }
   try {
-    const res = await fetch(`${getBaseUrl()}/api/discover?type=tv&sort_by=popularity.desc&page=1`, {
-      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
+    return await tmdbFetch<{ results?: any[] }>('/discover/tv', {
+      sort_by: 'popularity.desc',
+      page: '1'
     })
-    if (!res.ok) throw new Error(`Popular TV API failed: ${res.status}`)
-    return res.json()
   } catch (error) {
     console.error('Error fetching popular TV:', error)
     return { results: FALLBACK_TV }
@@ -60,11 +54,11 @@ async function getPopularTV() {
 async function getTopRatedMovies() {
   if (!HAS_TMDB_CREDS) return { results: FALLBACK_MOVIES }
   try {
-    const res = await fetch(`${getBaseUrl()}/api/discover?type=movie&sort_by=vote_average.desc&page=1`, {
-      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
+    return await tmdbFetch<{ results?: any[] }>('/discover/movie', {
+      sort_by: 'vote_average.desc',
+      page: '1',
+      'vote_count.gte': '200'
     })
-    if (!res.ok) throw new Error(`Top Rated Movies API failed: ${res.status}`)
-    return res.json()
   } catch (error) {
     console.error('Error fetching top rated movies:', error)
     return { results: FALLBACK_MOVIES }
@@ -74,11 +68,11 @@ async function getTopRatedMovies() {
 async function getTopRatedTV() {
   if (!HAS_TMDB_CREDS) return { results: FALLBACK_TV }
   try {
-    const res = await fetch(`${getBaseUrl()}/api/discover?type=tv&sort_by=vote_average.desc&page=1`, {
-      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
+    return await tmdbFetch<{ results?: any[] }>('/discover/tv', {
+      sort_by: 'vote_average.desc',
+      page: '1',
+      'vote_count.gte': '200'
     })
-    if (!res.ok) throw new Error(`Top Rated TV API failed: ${res.status}`)
-    return res.json()
   } catch (error) {
     console.error('Error fetching top rated TV:', error)
     return { results: FALLBACK_TV }
@@ -88,11 +82,11 @@ async function getTopRatedTV() {
 async function getUpcomingMovies() {
   if (!HAS_TMDB_CREDS) return { results: FALLBACK_UPCOMING }
   try {
-    const res = await fetch(`${getBaseUrl()}/api/discover?type=movie&sort_by=release_date.desc&page=1`, {
-      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
+    return await tmdbFetch<{ results?: any[] }>('/discover/movie', {
+      sort_by: 'primary_release_date.asc',
+      page: '1',
+      'primary_release_date.gte': new Date().toISOString().slice(0, 10)
     })
-    if (!res.ok) throw new Error(`Upcoming Movies API failed: ${res.status}`)
-    return res.json()
   } catch (error) {
     console.error('Error fetching upcoming movies:', error)
     return { results: FALLBACK_UPCOMING }
@@ -205,3 +199,5 @@ export default async function HomePage() {
     </div>
   )
 }
+
+

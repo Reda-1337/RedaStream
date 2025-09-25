@@ -2,24 +2,35 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import EnhancedFooter from '@/components/EnhancedFooter'
-import { getBaseUrl } from '@/lib/baseUrl'
+import { tmdbFetch } from '@/lib/tmdb'
 import MediaGrid from '@/components/MediaGrid'
+
 import { Play, Calendar, ListVideo, Star } from 'lucide-react'
 
+const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
+
+
+
 async function getDetails(id: string) {
-  const res = await fetch(`${getBaseUrl()}/api/details/tv/${id}`, {
-    next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 600) }
-  })
-  if (!res.ok) return null
-  return res.json()
+  if (!HAS_TMDB_CREDS) return null
+  try {
+    return await tmdbFetch(`/tv/${id}`, {
+      append_to_response: 'videos,images,credits,recommendations,release_dates,content_ratings,external_ids'
+    })
+  } catch (error) {
+    console.error(`Failed to load tv show ${id}:`, error)
+    return null
+  }
 }
 
 async function getSeason(id: string, seasonNumber: number) {
-  const res = await fetch(`${getBaseUrl()}/api/tv/${id}/season/${seasonNumber}`, {
-    next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) }
-  })
-  if (!res.ok) return null
-  return res.json()
+  if (!HAS_TMDB_CREDS) return null
+  try {
+    return await tmdbFetch(`/tv/${id}/season/${seasonNumber}`)
+  } catch (error) {
+    console.error(`Failed to load tv show ${id} season ${seasonNumber}:`, error)
+    return null
+  }
 }
 
 type TvPageProps = {
@@ -245,3 +256,4 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
     </div>
   )
 }
+

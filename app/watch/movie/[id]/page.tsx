@@ -5,38 +5,29 @@ import Header from "@/components/Header"
 import EnhancedFooter from "@/components/EnhancedFooter"
 import PlayerEmbed from "@/components/PlayerEmbed"
 import MediaGrid from "@/components/MediaGrid"
-import { getBaseUrl } from "@/lib/baseUrl"
+import { tmdbFetch } from "@/lib/tmdb"
+import { getMovieServers } from "@/lib/streaming"
 
-async function getMovieData(id: string) {
-  const [detailsRes, serversRes] = await Promise.all([
-    fetch(`${getBaseUrl()}/api/details/movie/${id}`, { next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 300) } }),
-    fetch(`${getBaseUrl()}/api/stream/movie/${id}`, { cache: "no-store" })
-  ])
+const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
 
-  const details = detailsRes.ok ? await detailsRes.json() : null
-  const serversPayload = serversRes.ok ? await serversRes.json() : { servers: [] }
-
-  return {
-    details,
-    servers: Array.isArray(serversPayload?.servers) ? serversPayload.servers : []
+async function getMovieDetails(id: string) {
+  if (!HAS_TMDB_CREDS) return null
+  try {
+    return await tmdbFetch(`/movie/${id}`, {
+      append_to_response: 'videos,images,credits,recommendations,release_dates,content_ratings,external_ids'
+    })
+  } catch (error) {
+    console.error(`Failed to load movie ${id}:`, error)
+    return null
   }
-}
-
-function normalizeServers(raw: any[]): { name: string; embedUrl: string; priority: number }[] {
-  return raw
-    .map((server, index) => ({
-      name: server?.name || `Server ${index + 1}`,
-      embedUrl: server?.embedUrl || server?.url || "",
-      priority: typeof server?.priority === "number" ? server.priority : index
-    }))
-    .filter((server) => server.embedUrl)
 }
 
 const FALLBACK_POSTER = "https://image.tmdb.org/t/p/w500/xJHokMbljvjADYdit5fK5VQsXEG.jpg"
 
 export default async function WatchMoviePage({ params }: { params: { id: string } }) {
-  const { details, servers } = await getMovieData(params.id)
-  const normalizedServers = normalizeServers(servers)
+  const details = await getMovieDetails(params.id)
+  const normalizedServers = getMovieServers(params.id)
+
   const recommendations = Array.isArray(details?.recommendations?.results) ? details.recommendations.results : []
   const backdrop = details?.backdrop_path ? `https://image.tmdb.org/t/p/original${details.backdrop_path}` : null
   const poster = details?.poster_path ? `https://image.tmdb.org/t/p/w500${details.poster_path}` : null

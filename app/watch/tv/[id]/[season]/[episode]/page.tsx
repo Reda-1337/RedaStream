@@ -1,4 +1,4 @@
-﻿import { getBaseUrl } from "@/lib/baseUrl"
+import { tmdbFetch } from "@/lib/tmdb"
 import { getTvServers } from "@/lib/streaming"
 import WatchTvEpisodeClient from "./WatchTvEpisodeClient"
 
@@ -23,13 +23,26 @@ type EpisodeSummary = {
   air_date?: string | null
 }
 
-async function fetchJson<T>(url: string, init?: RequestInit): Promise<T | null> {
-  const res = await fetch(url, init)
-  if (!res.ok) return null
+const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
+
+async function getTvDetails(id: string) {
+  if (!HAS_TMDB_CREDS) return null
   try {
-    return (await res.json()) as T
+    return await tmdbFetch(`/tv/${id}`, {
+      append_to_response: 'videos,images,credits,recommendations,content_ratings,external_ids'
+    })
   } catch (error) {
-    console.error(`Failed to parse JSON from ${url}`, error)
+    console.error(`Failed to load tv show ${id}:`, error)
+    return null
+  }
+}
+
+async function getSeasonDetails(id: string, seasonNumber: number) {
+  if (!HAS_TMDB_CREDS) return null
+  try {
+    return await tmdbFetch(`/tv/${id}/season/${seasonNumber}`)
+  } catch (error) {
+    console.error(`Failed to load tv show ${id} season ${seasonNumber}:`, error)
     return null
   }
 }
@@ -39,11 +52,9 @@ export default async function WatchTvEpisodePage({ params }: { params: RoutePara
   const seasonNumber = Number.parseInt(params.season || "1", 10) || 1
   const episodeNumber = Number.parseInt(params.episode || "1", 10) || 1
 
-  const baseUrl = getBaseUrl()
-
   const [details, seasonData] = await Promise.all([
-    fetchJson<any>(`${baseUrl}/api/details/tv/${id}`, { cache: "no-store" }),
-    fetchJson<any>(`${baseUrl}/api/tv/${id}/season/${seasonNumber}`, { cache: "no-store" })
+    getTvDetails(id),
+    getSeasonDetails(id, seasonNumber)
   ])
 
   const seasons: SeasonSummary[] = Array.isArray(details?.seasons)
@@ -81,3 +92,4 @@ export default async function WatchTvEpisodePage({ params }: { params: RoutePara
     />
   )
 }
+

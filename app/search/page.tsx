@@ -1,7 +1,7 @@
-﻿import Header from '@/components/Header'
+import Header from '@/components/Header'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import MediaGrid from '@/components/MediaGrid'
-import { getBaseUrl } from '@/lib/baseUrl'
+import { tmdbFetch } from '@/lib/tmdb'
 import Link from 'next/link'
 import { FALLBACK_MOVIES, FALLBACK_TRENDING, FALLBACK_TV } from '@/components/home/fallbackData'
 
@@ -28,19 +28,22 @@ async function fetchResults(query: string, type: 'all' | 'movie' | 'tv', page: s
     return { results: buildFallbackResults(type) }
   }
 
-  const params = new URLSearchParams({ q: query, page })
-  if (type !== 'all') params.set('type', type)
+  const trimmedQuery = query.trim()
+  const path = type === 'movie' ? '/search/movie' : type === 'tv' ? '/search/tv' : '/search/multi'
 
   try {
-    const res = await fetch(`${getBaseUrl()}/api/search?${params.toString()}`, {
-      next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 120) }
+    const data = await tmdbFetch<SearchResponse>(path, {
+      query: trimmedQuery,
+      page,
+      include_adult: 'false'
     })
 
-    if (!res.ok) {
-      return { results: buildFallbackResults(type) }
+    const results = Array.isArray(data.results) ? data.results : []
+    if (type === 'all') {
+      return { ...data, results: results.filter((item) => item.media_type !== 'person') }
     }
 
-    return res.json() as Promise<SearchResponse>
+    return { ...data, results }
   } catch (error) {
     console.error('Error searching TMDB:', error)
     return { results: buildFallbackResults(type) }
@@ -148,3 +151,4 @@ function SearchIcon() {
     </svg>
   )
 }
+

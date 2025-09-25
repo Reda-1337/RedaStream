@@ -3,15 +3,21 @@ import Link from 'next/link'
 import Header from '@/components/Header'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import MediaGrid from '@/components/MediaGrid'
-import { getBaseUrl } from '@/lib/baseUrl'
+import { tmdbFetch } from '@/lib/tmdb'
 import { Play, Clock, Star, Calendar } from 'lucide-react'
 
+const HAS_TMDB_CREDS = Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
+
 async function getDetails(id: string) {
-  const res = await fetch(`${getBaseUrl()}/api/details/movie/${id}`, {
-    next: { revalidate: Number(process.env.CACHE_TTL_SECONDS || 600) }
-  })
-  if (!res.ok) return null
-  return res.json()
+  if (!HAS_TMDB_CREDS) return null
+  try {
+    return await tmdbFetch(`/movie/${id}`, {
+      append_to_response: 'videos,images,credits,recommendations,release_dates,content_ratings,external_ids'
+    })
+  } catch (error) {
+    console.error(`Failed to load movie ${id}:`, error)
+    return null
+  }
 }
 
 type MoviePageProps = {
@@ -164,6 +170,4 @@ export default async function MovieDetailsPage({ params }: MoviePageProps) {
     </div>
   )
 }
-
-
 
