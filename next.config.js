@@ -1,4 +1,4 @@
-﻿/** @type {import('next').NextConfig} */
+/** @type {import('next').NextConfig} */
 function parseOrigins(value) {
   return (value || '')
     .split(/[\s,]+/)
@@ -51,7 +51,7 @@ const nextConfig = {
       "default-src 'self'",
       "img-src 'self' https: data:",
       "style-src 'self' 'unsafe-inline'",
-      "script-src 'self'",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       `frame-src 'self' ${allowedFrames}`,
       "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org",
       "font-src 'self' data:"
@@ -69,3 +69,4 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+
