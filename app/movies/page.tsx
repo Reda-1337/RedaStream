@@ -8,7 +8,7 @@ import { FALLBACK_MOVIES } from '@/components/home/fallbackData'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import CatalogResults from '@/components/CatalogResults'
 import { fetchCatalogFilters, getLanguageLabel } from '@/lib/catalog'
-import { tmdbFetch } from '@/lib/tmdb'
+import { hasTmdbCredentials, tmdbFetch } from '@/lib/tmdb'
 import { Suspense } from 'react'
 
 type SearchParams = Record<string, string | string[] | undefined>
@@ -125,6 +125,7 @@ export default async function MoviesPage({ searchParams }: { searchParams: Searc
   const normalizedParams = normalizeMovieParams(searchParams)
   const initialPage = coercePage(searchParams)
   const queryString = normalizedParams.toString()
+  const hasRemoteSource = hasTmdbCredentials()
 
   const [movieData, filters] = await Promise.all([
     getMovies(normalizedParams, initialPage),
@@ -205,6 +206,7 @@ export default async function MoviesPage({ searchParams }: { searchParams: Searc
                 initialTotalPages={totalPages}
                 queryKey={`movie-${queryString}-p${initialPage}`}
                 queryString={queryString}
+                hasRemoteSource={hasRemoteSource}
               />
             </div>
           ) : (
@@ -238,4 +240,5 @@ export default async function MoviesPage({ searchParams }: { searchParams: Searc
     </div>
   )
 }
+
 

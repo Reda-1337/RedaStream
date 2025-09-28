@@ -61,3 +61,4 @@
 ### References
 - FMovies UX inspiration: [FMovies](https://www.fmovies.gd/)
 
+- 2025-09-27: Relaxed CSP script-src in next.config.js ('self' 'unsafe-inline' 'unsafe-eval') to fix blank page in production caused by blocked Next.js inline runtime.

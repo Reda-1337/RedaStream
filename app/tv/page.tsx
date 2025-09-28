@@ -8,7 +8,7 @@ import { FALLBACK_TV } from '@/components/home/fallbackData'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import CatalogResults from '@/components/CatalogResults'
 import { fetchCatalogFilters, getLanguageLabel } from '@/lib/catalog'
-import { tmdbFetch } from '@/lib/tmdb'
+import { hasTmdbCredentials, tmdbFetch } from '@/lib/tmdb'
 import { Suspense } from 'react'
 
 type SearchParams = Record<string, string | string[] | undefined>
@@ -126,6 +126,7 @@ export default async function TvPage({ searchParams }: { searchParams: SearchPar
   const normalizedParams = normalizeTvParams(searchParams)
   const initialPage = coercePage(searchParams)
   const queryString = normalizedParams.toString()
+  const hasRemoteSource = hasTmdbCredentials()
 
   const [tvData, filters] = await Promise.all([
     getTvShows(normalizedParams, initialPage),
@@ -206,6 +207,7 @@ export default async function TvPage({ searchParams }: { searchParams: SearchPar
                 initialTotalPages={totalPages}
                 queryKey={`tv-${queryString}-p${initialPage}`}
                 queryString={queryString}
+                hasRemoteSource={hasRemoteSource}
               />
             </div>
           ) : (
@@ -239,4 +241,5 @@ export default async function TvPage({ searchParams }: { searchParams: SearchPar
     </div>
   )
 }
+
 

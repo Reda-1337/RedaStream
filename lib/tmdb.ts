@@ -2,6 +2,11 @@ export type TmdbMediaType = 'movie' | 'tv' | 'all'
 
 const TMDB_BASE_URL = 'https://api.themoviedb.org/3'
 
+export function hasTmdbCredentials() {
+  if (process.env.NEXT_PUBLIC_TMDB_ENABLED) return true
+  return Boolean(process.env.TMDB_READ_TOKEN || process.env.TMDB_API_KEY)
+}
+
 function getAuthHeaders(): HeadersInit {
   const headers: HeadersInit = { 'Accept': 'application/json' }
   const bearer = process.env.TMDB_READ_TOKEN
@@ -47,5 +52,3 @@ export async function tmdbFetch<T>(path: string, query?: Record<string, string |
 export function errorResponse(message: string, status = 500) {
   return Response.json({ error: { message } }, { status })
 }
-
-

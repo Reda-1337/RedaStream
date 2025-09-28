@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import MediaGrid from './MediaGrid'
@@ -23,11 +23,11 @@ type Props = {
   queryKey: string
   queryString: string
   type: 'movie' | 'tv'
+  hasRemoteSource: boolean
 }
 
 const LOADING_FALLBACK_COUNT = 6
 const FALLBACK_TOTAL_PAGES = 5
-const HAS_TMDB_CREDS = Boolean(process.env.NEXT_PUBLIC_TMDB_ENABLED) ? true : Boolean(process.env.TMDB_API_KEY || process.env.TMDB_READ_TOKEN)
 
 const FALLBACK_LIBRARY: Record<'movie' | 'tv', CatalogItem[]> = {
   movie: FALLBACK_MOVIES,
@@ -49,16 +49,18 @@ export default function CatalogResults({
   initialTotalPages,
   queryKey,
   queryString,
-  type
+  type,
+  hasRemoteSource
 }: Props) {
   const normalizedInitialPage = Number.isFinite(initialPage) && initialPage > 0 ? initialPage : 1
-  const normalizedInitialTotal = Number.isFinite(initialTotalPages) && initialTotalPages > 0 ? initialTotalPages : FALLBACK_TOTAL_PAGES
+  const normalizedInitialTotal = hasRemoteSource && Number.isFinite(initialTotalPages) && initialTotalPages > 0 ? initialTotalPages : FALLBACK_TOTAL_PAGES
 
   const [items, setItems] = useState<CatalogItem[]>(initialItems ?? [])
   const [page, setPage] = useState(normalizedInitialPage)
   const [maxPages, setMaxPages] = useState(normalizedInitialTotal)
   const [isLoading, setIsLoading] = useState(false)
   const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const remoteEnabled = hasRemoteSource
 
   useEffect(() => {
     setItems(initialItems ?? [])
@@ -84,7 +86,7 @@ export default function CatalogResults({
       appendItems(fallbackItems, Math.min(nextPage, FALLBACK_TOTAL_PAGES), FALLBACK_TOTAL_PAGES)
     }
 
-    if (!HAS_TMDB_CREDS) {
+    if (!remoteEnabled) {
       handleFallback()
       setIsLoading(false)
       return
@@ -129,7 +131,7 @@ export default function CatalogResults({
     } finally {
       setIsLoading(false)
     }
-  }, [appendItems, hasMore, isLoading, page, queryString, type])
+  }, [appendItems, hasMore, isLoading, page, queryString, remoteEnabled, type])
 
   useEffect(() => {
     if (!hasMore) return
