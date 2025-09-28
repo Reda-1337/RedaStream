@@ -38,7 +38,8 @@ const nextConfig = {
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: 'image.tmdb.org' },
-      { protocol: 'https', hostname: 'via.placeholder.com' }
+      { protocol: 'https', hostname: 'via.placeholder.com' },
+      { protocol: 'https', hostname: 'www.themoviedb.org' }
     ]
   },
   async headers() {
@@ -69,4 +70,5 @@ const nextConfig = {
 }
 
 module.exports = nextConfig
+
 

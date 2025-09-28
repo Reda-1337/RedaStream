@@ -1,5 +1,6 @@
-﻿"use client"
+"use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, type FormEvent } from "react"
@@ -30,16 +31,23 @@ export default function Header() {
         <div className="flex items-center justify-between gap-4 md:justify-start">
           <Link href="/" className="group inline-flex items-center gap-3">
             <div className="relative">
-              <div className="absolute inset-0 blur-lg bg-cyan-500/40 transition-colors group-hover:bg-cyan-400/60" />
-              <div className="relative flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-500 via-cyan-500 to-blue-600 shadow-[0_10px_30px_rgba(14,165,233,0.35)]">
-                <span className="text-xl font-black text-white">R+</span>
-              </div>
+              <div className="absolute inset-0 scale-[1.18] rounded-3xl bg-cyan-400/40 blur-xl transition-opacity group-hover:bg-cyan-300/60" />
+              <Image
+                src="/logo-mark.svg"
+                alt="RedaStream brand mark"
+                width={44}
+                height={44}
+                priority
+                className="relative h-11 w-11 drop-shadow-[0_12px_30px_rgba(14,165,233,0.35)]"
+              />
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-wide text-white transition-colors group-hover:text-cyan-300 sm:text-2xl">
-                RedaStream+
+              <h1 className="text-xl font-semibold tracking-wide sm:text-2xl">
+                <span className="bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-400 bg-clip-text text-transparent transition-all duration-200 group-hover:from-cyan-100 group-hover:to-sky-300">
+                  RedaStream+
+                </span>
               </h1>
-              <p className="text-[10px] uppercase tracking-[0.25em] text-slate-400 sm:text-xs">Cinematic Universe</p>
+              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 sm:text-xs">Cinematic Multiverse</p>
             </div>
           </Link>
         </div>

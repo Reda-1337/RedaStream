@@ -5,8 +5,21 @@ import { Inter } from 'next/font/google'
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  title: 'RedaStream',
-  description: 'Movies & TV streaming catalog powered by TMDB'
+  metadataBase: new URL('https://reda-stream.vercel.app'),
+  title: {
+    default: 'RedaStream+',
+    template: '%s | RedaStream+'
+  },
+  description: 'Movies & TV streaming catalog powered by TMDB',
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' }
+    ],
+    apple: { url: '/icon-192.png', type: 'image/png', sizes: '192x192' },
+    shortcut: ['/favicon.svg']
+  },
+  manifest: '/site.webmanifest'
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -20,5 +33,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     </html>
   )
 }
+
 
 

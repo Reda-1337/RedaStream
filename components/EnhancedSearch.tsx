@@ -1,5 +1,6 @@
 "use client"
 
+import Image from 'next/image'
 import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Search, X, Loader2, Star, Calendar, Play } from 'lucide-react'
@@ -232,20 +233,23 @@ export default function EnhancedSearch() {
               >
                 <div className="flex items-center gap-4">
                   {/* Poster */}
-                  <div className="flex h-20 w-16 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-slate-900">
+                  <div className="relative h-20 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-slate-900">
                     {item.poster_path ? (
-                      <img
+                      <Image
                         src={`https://image.tmdb.org/t/p/w200${item.poster_path}`}
                         alt={title}
-                        className="w-full h-full object-cover rounded-lg"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement
+                        fill
+                        sizes="64px"
+                        className="h-full w-full rounded-lg object-cover"
+                        onError={(event) => {
+                          const target = event.currentTarget as HTMLImageElement
                           target.style.display = 'none'
-                          target.nextElementSibling?.classList.remove('hidden')
+                          const fallback = target.parentElement?.querySelector('.poster-fallback') as HTMLElement | null
+                          fallback?.classList.remove('hidden')
                         }}
                       />
                     ) : null}
-                    <div className={`flex h-full w-full items-center justify-center ${item.poster_path ? 'hidden' : ''}`}>
+                    <div className={`poster-fallback flex h-full w-full items-center justify-center ${item.poster_path ? 'hidden' : ''}`}>
                       <Play className="h-6 w-6 text-slate-500" />
                     </div>
                   </div>
@@ -291,3 +295,5 @@ export default function EnhancedSearch() {
     </div>
   )
 }
+
+
