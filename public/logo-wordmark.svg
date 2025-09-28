@@ -1,38 +1,43 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 160" role="img" aria-labelledby="logoTitle logoDesc">
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 180" role="img" aria-labelledby="logoTitle logoDesc">
   <title id="logoTitle">RedaStream Plus logo</title>
-  <desc id="logoDesc">Glowing rounded rectangle with the word RedaStream plus sign</desc>
+  <desc id="logoDesc">Glowing rounded rectangle with centered RedaStream plus wordmark</desc>
   <defs>
-    <linearGradient id="bg" x1="50%" y1="0%" x2="50%" y2="100%">
-      <stop offset="0%" stop-color="#020915" />
-      <stop offset="100%" stop-color="#071325" />
+    <radialGradient id="outerGlow" cx="50%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#0b2338" />
+      <stop offset="80%" stop-color="#030912" />
+      <stop offset="100%" stop-color="#01070f" />
+    </radialGradient>
+    <linearGradient id="pill" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#031424" />
+      <stop offset="100%" stop-color="#071f34" />
     </linearGradient>
-    <linearGradient id="rim" x1="0%" y1="50%" x2="100%" y2="50%">
-      <stop offset="0%" stop-color="#05c6ff" stop-opacity=".45" />
-      <stop offset="100%" stop-color="#3be6ff" stop-opacity=".45" />
+    <linearGradient id="strokeGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#02d0ff" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#6af6ff" stop-opacity="0.45" />
     </linearGradient>
-    <linearGradient id="textGradient" x1="0%" y1="50%" x2="100%" y2="50%">
-      <stop offset="0%" stop-color="#4defff" />
-      <stop offset="100%" stop-color="#78fdfa" />
+    <linearGradient id="textGrad" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="0%" stop-color="#47eaff" />
+      <stop offset="100%" stop-color="#8afaff" />
     </linearGradient>
-    <filter id="glow" x="-20%" y="-40%" width="140%" height="200%" color-interpolation-filters="sRGB">
-      <feGaussianBlur in="SourceGraphic" stdDeviation="18" result="blur" />
-      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.07  0 0 0 0 0.75  0 0 0 0 0.95  0 0 0 0.45 0" result="colored" />
-      <feMerge>
-        <feMergeNode in="colored" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
+    <filter id="pillGlow" x="-18%" y="-40%" width="136%" height="220%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="20" result="blur" />
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.08  0 0 0 0 0.73  0 0 0 0 0.98  0 0 0 0.45 0" />
+      <feBlend in="SourceGraphic" mode="screen" />
     </filter>
   </defs>
 
-  <rect width="360" height="160" rx="32" fill="#030911" />
-  <g transform="translate(24 34)">
-    <rect x="0" y="0" width="312" height="92" rx="28" fill="url(#bg)" stroke="url(#rim)" stroke-width="2.5" filter="url(#glow)" />
-    <text x="156" y="61" fill="url(#textGradient)" font-family="'Inter', 'Segoe UI', sans-serif" font-size="44" font-weight="700" letter-spacing="0.22em" text-anchor="middle">REDASTREAM+</text>
+  <rect width="420" height="180" rx="36" fill="url(#outerGlow)" />
+  <g transform="translate(40 36)">
+    <rect x="0" y="0" width="340" height="108" rx="36" fill="url(#pill)" stroke="url(#strokeGrad)" stroke-width="3" filter="url(#pillGlow)" />
+    <rect x="48" y="34" width="244" height="44" rx="22" fill="none" stroke="#19c5ff" stroke-opacity="0.4" stroke-width="2" />
+    <text x="170" y="58" fill="url(#textGrad)" font-family="'Inter', 'Segoe UI', Arial, sans-serif" font-size="36" font-weight="700" letter-spacing="0.08em" text-anchor="middle" dominant-baseline="middle">
+      REDASTREAM+
+    </text>
   </g>
 
-  <g fill="#35d3ff" opacity=".25">
-    <circle cx="180" cy="126" r="5" />
-    <circle cx="206" cy="126" r="4" />
-    <circle cx="154" cy="126" r="4" />
+  <g transform="translate(0 20)" fill="#44d7ff" fill-opacity="0.35">
+    <circle cx="210" cy="128" r="5" />
+    <circle cx="194" cy="128" r="4" />
+    <circle cx="226" cy="128" r="4" />
   </g>
 </svg>
