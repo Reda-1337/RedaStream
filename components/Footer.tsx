@@ -3,35 +3,31 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-gray-800/50 py-8">
+    <footer className="mt-20 border-t border-slate-900/60 bg-slate-950/40 py-12">
       <div className="container mx-auto px-4">
-        <div className="grid gap-8 md:grid-cols-4">
-          <div className="md:col-span-2">
-            <div className="mb-4 flex items-center gap-3">
-              <div className="relative">
-                <div className="absolute inset-0 scale-[1.25] rounded-2xl bg-cyan-400/30 blur-xl" />
-                <Image
-                  src="/logo-mark.svg"
-                  alt="RedaStream brand mark"
-                  width={32}
-                  height={32}
-                  className="relative h-8 w-8 drop-shadow-[0_10px_24px_rgba(59,130,246,0.35)]"
-                />
-              </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-cyan-300 via-sky-400 to-violet-400 bg-clip-text text-transparent">
-                RedaStream+
-              </span>
+        <div className="grid gap-10 md:grid-cols-4">
+          <div className="md:col-span-2 space-y-5">
+            <div className="relative inline-flex">
+              <div className="absolute inset-0 -m-2 rounded-[32px] bg-cyan-500/25 blur-3xl" />
+              <Image
+                src="/logo-wordmark.svg"
+                alt="RedaStream+"
+                width={280}
+                height={110}
+                className="relative h-12 w-auto"
+                priority
+              />
             </div>
-            <p className="mb-4 text-sm text-gray-400">
-              Discover and stream your favorite movies and TV shows. Powered by TMDB for accurate metadata and recommendations.
+            <p className="max-w-md text-sm text-slate-400">
+              RedaStream+ lets you dive into premium films and series with a slick, cinematic interface inspired by the best streaming hubs.
             </p>
-            <div className="text-xs text-gray-500">
+            <div className="text-xs text-slate-500">
               <p>This product uses the TMDb API but is not endorsed or certified by TMDb.</p>
               <Link
                 href="https://www.themoviedb.org"
                 target="_blank"
                 rel="noreferrer"
-                className="mt-2 inline-block transition-opacity hover:opacity-80"
+                className="mt-3 inline-flex items-center gap-2 text-cyan-300 transition hover:text-cyan-100"
               >
                 <Image
                   src="https://www.themoviedb.org/assets/2/v4/logos/v2/blue_short-8e7b30f73a4020692ccca9c88bafe5dcb6f8a62a4c6bc55cd9ba82bb2cd95f6c.svg"
@@ -40,46 +36,47 @@ export default function Footer() {
                   height={24}
                   className="h-6 w-auto"
                 />
+                <span>Visit TMDb</span>
               </Link>
             </div>
           </div>
 
           <div>
-            <h3 className="mb-4 text-white font-semibold">Browse</h3>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.35em] text-slate-300">Browse</h3>
+            <ul className="space-y-2 text-sm text-slate-400">
               <li>
-                <Link href="/movies" className="transition-colors hover:text-purple-400">
+                <Link href="/movies" className="transition-colors hover:text-cyan-300">
                   Popular Movies
                 </Link>
               </li>
               <li>
-                <Link href="/tv" className="transition-colors hover:text-purple-400">
+                <Link href="/tv" className="transition-colors hover:text-cyan-300">
                   Popular TV Shows
                 </Link>
               </li>
               <li>
-                <Link href="/" className="transition-colors hover:text-purple-400">
-                  Trending
+                <Link href="/" className="transition-colors hover:text-cyan-300">
+                  Trending Today
                 </Link>
               </li>
             </ul>
           </div>
 
           <div>
-            <h3 className="mb-4 text-white font-semibold">Legal</h3>
-            <ul className="space-y-2 text-sm text-gray-400">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-[0.35em] text-slate-300">Legal</h3>
+            <ul className="space-y-2 text-sm text-slate-400">
               <li>
-                <Link href="#" className="transition-colors hover:text-purple-400">
+                <Link href="#" className="transition-colors hover:text-cyan-300">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="#" className="transition-colors hover:text-purple-400">
+                <Link href="#" className="transition-colors hover:text-cyan-300">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="#" className="transition-colors hover:text-purple-400">
+                <Link href="#" className="transition-colors hover:text-cyan-300">
                   DMCA
                 </Link>
               </li>
@@ -87,8 +84,13 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-gray-800/50 pt-6 text-center text-sm text-gray-500">
-          <p>&copy; 2024 RedaStream. All rights reserved.</p>
+        <div className="mt-10 flex flex-col items-center gap-4 border-t border-slate-900/60 pt-6 text-center text-xs text-slate-500">
+          <div className="flex items-center gap-2 text-cyan-400">
+            <span className="inline-block h-2 w-2 rounded-full bg-cyan-400" />
+            <span className="inline-block h-2 w-2 rounded-full bg-cyan-400/70" />
+            <span className="inline-block h-2 w-2 rounded-full bg-cyan-400/50" />
+          </div>
+          <p>&copy; {new Date().getFullYear()} RedaStream+. Crafted for immersive streaming.</p>
         </div>
       </div>
     </footer>

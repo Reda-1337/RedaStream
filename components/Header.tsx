@@ -29,26 +29,16 @@ export default function Header() {
     <header className="sticky top-0 z-50 border-b border-slate-800/40 bg-slate-950/80 backdrop-blur-xl shadow-[0_12px_60px_rgba(8,47,73,0.45)]">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between">
         <div className="flex items-center justify-between gap-4 md:justify-start">
-          <Link href="/" className="group inline-flex items-center gap-3">
-            <div className="relative">
-              <div className="absolute inset-0 scale-[1.18] rounded-3xl bg-cyan-400/40 blur-xl transition-opacity group-hover:bg-cyan-300/60" />
-              <Image
-                src="/logo-mark.svg"
-                alt="RedaStream brand mark"
-                width={44}
-                height={44}
-                priority
-                className="relative h-11 w-11 drop-shadow-[0_12px_30px_rgba(14,165,233,0.35)]"
-              />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold tracking-wide sm:text-2xl">
-                <span className="bg-gradient-to-r from-cyan-200 via-sky-300 to-violet-400 bg-clip-text text-transparent transition-all duration-200 group-hover:from-cyan-100 group-hover:to-sky-300">
-                  RedaStream+
-                </span>
-              </h1>
-              <p className="text-[10px] uppercase tracking-[0.3em] text-slate-400 sm:text-xs">Cinematic Multiverse</p>
-            </div>
+          <Link href="/" className="group relative inline-flex">
+            <div className="absolute inset-0 -m-2 rounded-[32px] bg-cyan-500/20 blur-3xl transition duration-500 group-hover:bg-cyan-400/30" />
+            <Image
+              src="/logo-wordmark.svg"
+              alt="RedaStream+"
+              width={256}
+              height={96}
+              priority
+              className="relative h-12 w-auto md:h-14"
+            />
           </Link>
         </div>
 
