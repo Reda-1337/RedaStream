@@ -77,10 +77,10 @@ export default async function WatchTvEpisodePage({ params }: { params: RoutePara
   const showName = details?.name ?? 'TV Series'
   const seasons: SeasonSummary[] = Array.isArray(details?.seasons)
     ? details.seasons
-      .filter((season: any) => typeof season?.season_number === "number" && season.season_number > 0)
+      .filter((season: any) => typeof season?.season_number === "number" && season.season_number >= 0)
       .map((season: any) => ({
         season_number: season.season_number,
-        name: season.name || `Season ${season.season_number}`,
+        name: season.season_number === 0 ? 'Specials' : (season.name || `Season ${season.season_number}`),
         episode_count: season.episode_count
       }))
     : []

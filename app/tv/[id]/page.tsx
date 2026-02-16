@@ -157,7 +157,7 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
                   className="inline-flex items-center gap-3 rounded-full bg-cyan-500 px-8 py-3 text-sm font-semibold text-slate-900 shadow-[0_18px_45px_rgba(6,182,212,0.45)] transition hover:-translate-y-0.5 hover:bg-cyan-400"
                 >
                   <Play className="h-5 w-5" />
-                  Start Season {currentSeasonNumber}
+                  Start {currentSeasonNumber === 0 ? 'Specials' : `Season ${currentSeasonNumber}`}
                 </Link>
                 <button className="inline-flex items-center gap-3 rounded-full border border-slate-700/60 bg-slate-900/70 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-cyan-400/60 hover:text-white">
                   Add to Watchlist
@@ -180,13 +180,12 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
                   <Link
                     key={season.id ?? seasonNumber}
                     href={`/tv/${params.id}?${queryParams.toString()}`}
-                    className={`rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${
-                      isActive
+                    className={`rounded-full border px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] transition ${isActive
                         ? 'border-cyan-400/70 bg-cyan-500/10 text-cyan-100 shadow-[0_12px_28px_rgba(6,182,212,0.35)]'
                         : 'border-transparent bg-slate-900/60 text-slate-400 hover:border-slate-700/60 hover:text-white'
-                    }`}
+                      }`}
                   >
-                    Season {seasonNumber}
+                    {seasonNumber === 0 ? 'Specials' : `Season ${seasonNumber}`}
                   </Link>
                 )
               })}
@@ -197,7 +196,7 @@ export default async function TvDetailsPage({ params, searchParams }: TvPageProp
                 <div>
                   <p className="text-xs uppercase tracking-[0.4em] text-cyan-300">Episodes</p>
                   <h2 className="mt-2 text-2xl font-semibold text-white">
-                    Season {currentSeasonNumber}
+                    {currentSeasonNumber === 0 ? 'Specials' : `Season ${currentSeasonNumber}`}
                     {seasonData?.episodes?.length ? `  -  ${seasonData.episodes.length} Episodes` : ''}
                   </h2>
                 </div>
