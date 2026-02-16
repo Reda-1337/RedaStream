@@ -12,17 +12,20 @@ export function middleware(_request: NextRequest) {
     const response = NextResponse.next()
 
     /* ---------- Content-Security-Policy ---------- */
+    // Relaxed CSP to allow various IPTV stream sources
     const csp = [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
         "style-src 'self' 'unsafe-inline'",
         "font-src 'self' data:",
-        // Allow iframes ONLY from Rivestream
+        // Allow iframes from Rivestream
         "frame-src 'self' https://watch.rivestream.app https://*.rivestream.app",
-        // Allow data fetches to known APIs
-        "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org https://kitsu.app https://watch.rivestream.app https://iptv-org.github.io",
-        // Allow images from trusted sources only
-        "img-src 'self' data: blob: https://image.tmdb.org https://www.themoviedb.org https://media.kitsu.app https://upload.wikimedia.org https://watch.rivestream.app",
+        // Allow connections to any HTTPS source because IPTV streams vary wildly
+        "connect-src 'self' https:",
+        // Allow media from any HTTPS source
+        "media-src 'self' https: blob: data:",
+        // Allow images from any HTTPS source (logos, posters, etc)
+        "img-src 'self' data: blob: https:",
         // Prevent other sites from framing us
         "frame-ancestors 'self'",
         // Restrict form submissions

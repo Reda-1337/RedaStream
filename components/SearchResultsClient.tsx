@@ -2,8 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import { LayoutGrid, List } from 'lucide-react'
 
 import MediaGrid from '@/components/MediaGrid'
+import SearchItemCard from '@/components/SearchItemCard'
 import type { AdvancedSearchResult, SearchType } from '@/lib/search'
 
 type SearchItem = AdvancedSearchResult['results'][number]
@@ -70,6 +72,9 @@ export default function SearchResultsClient({
   const [lastSeenSource, setLastSeenSource] = useState(source)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Default to list view as requested for "reltime" style
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list')
 
   useEffect(() => {
     setItems(dedupeItems(initialResults))
@@ -183,28 +188,41 @@ export default function SearchResultsClient({
   }
 
   return (
-    <div className="mt-10 space-y-8">
+    <div className="mt-8 space-y-6">
       <section>
-        <div className="space-y-1 text-sm text-slate-400">
-          <div>
-            Showing {displayCount} of {totalResults || displayCount} results for
-            <span className="pl-2 text-cyan-200">"{baseQueryLabel}"</span>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div className="space-y-1 text-sm text-slate-400">
+            <div className="text-base font-semibold text-white">
+              Found {totalResults} results for <span className="text-cyan-400">"{baseQueryLabel}"</span>
+            </div>
+            {currentAppliedQuery && currentAppliedQuery !== normalizedQuery && (
+              <div className="text-xs text-slate-500">
+                Matches for <span className="text-cyan-200">"{currentAppliedQuery}"</span>
+              </div>
+            )}
+            {isFallback && (
+              <div className="text-xs text-slate-500">
+                Showing best matches based on spelling.
+              </div>
+            )}
           </div>
-          {currentAppliedQuery && currentAppliedQuery !== normalizedQuery && (
-            <div className="text-xs text-slate-500">
-              Displaying closest matches for <span className="text-cyan-200">"{currentAppliedQuery}"</span>
-            </div>
-          )}
-          {isFallback && (
-            <div className="text-xs text-slate-500">
-              Showing best available matches based on your query spelling.
-            </div>
-          )}
-          {lastSeenSource === 'tmdb-keyword' && (
-            <div className="text-xs text-slate-500">
-              Related keyword matches have been included for broader coverage.
-            </div>
-          )}
+
+          <div className="flex items-center gap-2 rounded-lg border border-slate-800/60 bg-slate-900/50 p-1">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`rounded-md p-1.5 transition ${viewMode === 'grid' ? 'bg-slate-800 text-cyan-400' : 'text-slate-400 hover:text-white'}`}
+              aria-label="Grid view"
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`rounded-md p-1.5 transition ${viewMode === 'list' ? 'bg-slate-800 text-cyan-400' : 'text-slate-400 hover:text-white'}`}
+              aria-label="List view"
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         {suggestions.length > 0 && (
@@ -224,10 +242,24 @@ export default function SearchResultsClient({
         )}
 
         <div className="mt-6 space-y-6">
-          <div>
-            <h2 className="mb-5 text-xl font-semibold text-white">Movies & TV Shows</h2>
+          {viewMode === 'grid' ? (
             <MediaGrid items={items} />
-          </div>
+          ) : (
+            <div className="space-y-4">
+              {items.map((item) => (
+                <SearchItemCard
+                  key={`${item.media_type}-${item.id}`}
+                  id={item.id}
+                  title={item.title || item.name || 'Untitled'}
+                  overview={item.overview}
+                  posterPath={item.poster_path || null}
+                  year={(item.release_date || item.first_air_date || '').slice(0, 4)}
+                  rating={item.vote_average}
+                  mediaType={item.media_type === 'movie' || item.media_type === 'tv' ? item.media_type : (item.first_air_date ? 'tv' : 'movie')}
+                />
+              ))}
+            </div>
+          )}
 
           {error && (
             <div className="rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-xs text-red-200">
@@ -241,11 +273,10 @@ export default function SearchResultsClient({
                 type="button"
                 onClick={handleLoadMore}
                 disabled={isLoading}
-                className={`inline-flex items-center gap-2 rounded-full border px-6 py-2 text-xs font-semibold uppercase tracking-[0.35em] transition ${
-                  isLoading
-                    ? 'border-cyan-400/40 bg-cyan-500/10 text-cyan-200'
-                    : 'border-cyan-400/60 bg-cyan-500/10 text-cyan-100 hover:-translate-y-0.5 hover:bg-cyan-500/20'
-                }`}
+                className={`inline-flex items-center gap-2 rounded-full border px-6 py-2 text-xs font-semibold uppercase tracking-[0.35em] transition ${isLoading
+                  ? 'border-cyan-400/40 bg-cyan-500/10 text-cyan-200'
+                  : 'border-cyan-400/60 bg-cyan-500/10 text-cyan-100 hover:-translate-y-0.5 hover:bg-cyan-500/20'
+                  }`}
               >
                 {isLoading ? 'Loading...' : 'Load more results'}
               </button>
@@ -267,5 +298,4 @@ function SearchIcon() {
     </svg>
   )
 }
-
 
