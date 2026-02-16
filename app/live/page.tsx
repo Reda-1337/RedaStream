@@ -23,6 +23,8 @@ export default function LiveTVPage() {
     const [activeLanguage, setActiveLanguage] = useState<string>('All')
     const [searchQuery, setSearchQuery] = useState('')
 
+    const [visibleCount, setVisibleCount] = useState(50)
+
     const filtered = useMemo(() => {
         return FEATURED_CHANNELS.filter((ch) => {
             const catMatch = activeCategory === 'All' || ch.category === activeCategory
@@ -31,6 +33,13 @@ export default function LiveTVPage() {
             return catMatch && langMatch && searchMatch
         })
     }, [activeCategory, activeLanguage, searchQuery])
+
+    // Reset pagination when filters change
+    useMemo(() => {
+        setVisibleCount(50)
+    }, [activeCategory, activeLanguage, searchQuery])
+
+    const visibleChannels = filtered.slice(0, visibleCount)
 
     return (
         <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-sans selection:bg-cyan-500/30">
@@ -94,7 +103,7 @@ export default function LiveTVPage() {
 
                 {/* Grid Layout - 4 Columns on Desktop */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filtered.map((ch, i) => (
+                    {visibleChannels.map((ch, i) => (
                         <Link
                             key={i}
                             href={`/live/watch?url=${encodeURIComponent(ch.streamUrl)}&name=${encodeURIComponent(ch.name)}`}
@@ -159,6 +168,18 @@ export default function LiveTVPage() {
                         </Link>
                     ))}
                 </div>
+
+                {/* Load More Button */}
+                {visibleCount < filtered.length && (
+                    <div className="flex justify-center mt-12">
+                        <button
+                            onClick={() => setVisibleCount((prev) => prev + 50)}
+                            className="px-8 py-3 bg-slate-800 hover:bg-cyan-600 text-slate-300 hover:text-white rounded-full font-semibold transition-all duration-300 border border-slate-700 hover:border-cyan-500 shadow-lg"
+                        >
+                            Load More Channels ({filtered.length - visibleCount} remaining)
+                        </button>
+                    </div>
+                )}
 
                 {filtered.length === 0 && (
                     <div className="flex flex-col items-center justify-center py-32 text-center opacity-60">
