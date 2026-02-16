@@ -97,20 +97,52 @@ export default function Header() {
         </div>
       </div>
 
+      {/* Desktop nav — visible on lg+ */}
+      <nav className="mx-auto hidden w-full max-w-7xl items-center gap-1 px-4 pb-3 pt-1 lg:flex">
+        {navItems.map(({ href, label, icon: Icon }) => {
+          const isActive = pathname === href || (href !== "/" && pathname.startsWith(href))
+          const isLive = href === "/live"
+          return (
+            <Link
+              key={href}
+              href={href as any}
+              className={`relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
+                ? 'text-white'
+                : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                }`}
+            >
+              <Icon className={`h-4 w-4 ${isActive ? 'text-cyan-400' : ''}`} />
+              {label}
+              {isLive && (
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              )}
+              {isActive && (
+                <span className="absolute bottom-0 left-3 right-3 h-0.5 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 nav-active-line" />
+              )}
+            </Link>
+          )
+        })}
+      </nav>
+
+      {/* Mobile nav — visible below lg */}
       <nav className="mx-auto flex w-full max-w-7xl gap-2 overflow-x-auto px-4 pb-3 pt-1 text-sm lg:hidden">
         {navItems.map(({ href, label, icon: Icon }) => {
           const isActive = pathname === href || (href !== "/" && pathname.startsWith(href))
+          const isLive = href === "/live"
           return (
             <Link
               key={href}
               href={href as any}
               className={`inline-flex flex-shrink-0 items-center gap-2 rounded-full border px-4 py-2 transition ${isActive
-                  ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-100'
-                  : 'border-transparent bg-slate-900/50 text-slate-300 hover:border-slate-700/60 hover:text-white'
+                ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-100'
+                : 'border-transparent bg-slate-900/50 text-slate-300 hover:border-slate-700/60 hover:text-white'
                 }`}
             >
               <Icon className="h-4 w-4" />
               {label}
+              {isLive && (
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+              )}
             </Link>
           )
         })}

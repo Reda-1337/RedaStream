@@ -1,8 +1,9 @@
 import './globals.css'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Outfit } from 'next/font/google'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--font-inter' })
+const outfit = Outfit({ subsets: ['latin'], display: 'swap', variable: '--font-outfit', weight: ['400', '500', '600', '700', '800'] })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://reda-stream.vercel.app'),
@@ -77,7 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={`${inter.variable} font-sans text-slate-100 antialiased`}>
+      <body className={`${inter.variable} ${outfit.variable} font-sans text-slate-100 antialiased`}>
         <div className="min-h-screen bg-[radial-gradient(circle_at_top,_#1d2845_0%,_#07080f_60%,_#03040a_100%)]">
           {children}
         </div>
