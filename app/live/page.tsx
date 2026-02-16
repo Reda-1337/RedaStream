@@ -152,7 +152,7 @@ export default function LiveTVPage() {
                                     </span>
                                     <span className="text-xs text-slate-600">•</span>
                                     <span className="text-xs text-slate-500">
-                                        {LANG_LABELS[ch.language] || ch.language.toUpperCase()}
+                                        {(ch.language && LANG_LABELS[ch.language]) || (ch.language || 'EN').toUpperCase()}
                                     </span>
                                 </div>
                             </div>
