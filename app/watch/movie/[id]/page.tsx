@@ -3,10 +3,9 @@ import Link from "next/link"
 
 import Header from "@/components/Header"
 import EnhancedFooter from "@/components/EnhancedFooter"
-import PlayerEmbed from "@/components/PlayerEmbed"
+import RivePlayer from "@/components/RivePlayer"
 import MediaGrid from "@/components/MediaGrid"
 import { tmdbFetch } from "@/lib/tmdb"
-import { getMovieServers } from "@/lib/streaming"
 
 type MovieDetails = {
   backdrop_path?: string | null
@@ -39,7 +38,6 @@ const FALLBACK_POSTER = "https://image.tmdb.org/t/p/w500/xJHokMbljvjADYdit5fK5VQ
 
 export default async function WatchMoviePage({ params }: { params: { id: string } }) {
   const details = await getMovieDetails(params.id)
-  const normalizedServers = getMovieServers(params.id)
   const title = details?.title ?? 'Movie'
 
   const recommendations = Array.isArray(details?.recommendations?.results) ? details.recommendations.results : []
@@ -113,14 +111,8 @@ export default async function WatchMoviePage({ params }: { params: { id: string 
               )}
 
               <div className="mt-6">
-                <PlayerEmbed initialServers={normalizedServers} />
+                <RivePlayer type="movie" tmdbId={params.id} />
               </div>
-
-              {normalizedServers.length === 0 && (
-                <div className="mt-4 rounded-2xl border border-slate-800/60 bg-slate-950/70 p-4 text-sm text-slate-300">
-                  No embedded sources were returned for this title. Try checking the details page for alternative options.
-                </div>
-              )}
             </div>
           </div>
         </div>

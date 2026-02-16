@@ -4,8 +4,10 @@ import EnhancedHeroSection from '@/components/EnhancedHeroSection'
 import ContentSection from '@/components/ContentSection'
 import LoadingSkeleton from '@/components/LoadingSkeleton'
 import ErrorBoundary from '@/components/ErrorBoundary'
-import { tmdbFetch } from '@/lib/tmdb'
+import { tmdbFetch, getKDramas, getAnime } from '@/lib/tmdb'
+import { FEATURED_CHANNELS } from '@/lib/iptv'
 import { Suspense } from 'react'
+import Link from 'next/link'
 import {
   FALLBACK_MOVIES,
   FALLBACK_TRENDING,
@@ -98,14 +100,36 @@ function unwrapResults<T extends { results?: any[] }>(data: T | null | undefined
   return data.results
 }
 
+async function safeGetKDramas() {
+  if (!HAS_TMDB_CREDS) return []
+  try {
+    const data = await getKDramas()
+    return (data.results || []).map((item: any) => ({ ...item, media_type: 'tv' }))
+  } catch {
+    return []
+  }
+}
+
+async function safeGetAnime() {
+  if (!HAS_TMDB_CREDS) return []
+  try {
+    const data = await getAnime()
+    return (data.results || []).map((item: any) => ({ ...item, media_type: 'tv' }))
+  } catch {
+    return []
+  }
+}
+
 export default async function HomePage() {
-  const [trendingData, popularMoviesData, popularTVData, topRatedMoviesData, topRatedTVData, upcomingMoviesData] = await Promise.all([
+  const [trendingData, popularMoviesData, popularTVData, topRatedMoviesData, topRatedTVData, upcomingMoviesData, kdramaItems, animeItems] = await Promise.all([
     getTrending(),
     getPopularMovies(),
     getPopularTV(),
     getTopRatedMovies(),
     getTopRatedTV(),
-    getUpcomingMovies()
+    getUpcomingMovies(),
+    safeGetKDramas(),
+    safeGetAnime(),
   ])
 
   const trendingItems = unwrapResults(trendingData)
@@ -192,6 +216,73 @@ export default async function HomePage() {
               viewAllHref="/movies?sort=upcoming"
             />
           </ErrorBoundary>
+
+          {kdramaItems.length > 0 && (
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load K-Dramas</div>}>
+              <ContentSection
+                sectionId="kdramas-section"
+                title="K-Dramas"
+                subtitle="Popular Korean dramas trending this week."
+                icon="🇰🇷"
+                items={kdramaItems.slice(0, 20)}
+                viewAllHref="/kdramas"
+              />
+            </ErrorBoundary>
+          )}
+
+          {animeItems.length > 0 && (
+            <ErrorBoundary fallback={<div className="py-8 text-center text-gray-400">Failed to load Anime</div>}>
+              <ContentSection
+                sectionId="anime-section"
+                title="Anime"
+                subtitle="Top anime series from Japan."
+                icon="🍥"
+                items={animeItems.slice(0, 20)}
+                viewAllHref="/anime"
+              />
+            </ErrorBoundary>
+          )}
+
+          {/* Live TV Section */}
+          <section className="px-4 sm:px-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-red-500/15 text-red-400">
+                  <span className="inline-block w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                </span>
+                <div>
+                  <h2 className="text-2xl font-semibold text-white">Live TV</h2>
+                  <p className="text-sm text-slate-400">Free live channels from around the world.</p>
+                </div>
+              </div>
+              <Link
+                href="/live"
+                className="inline-flex items-center gap-2 rounded-full border border-slate-700/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.25em] text-slate-300 transition hover:border-cyan-400/60 hover:text-white"
+              >
+                View All
+                <span className="text-cyan-400">{'>'}</span>
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+              {FEATURED_CHANNELS.slice(0, 4).map((ch, i) => (
+                <Link
+                  key={i}
+                  href={`/live/watch?url=${encodeURIComponent(ch.streamUrl)}&name=${encodeURIComponent(ch.name)}`}
+                  className="flex items-center gap-3 p-4 rounded-2xl border border-slate-800/60 bg-slate-900/50 hover:bg-slate-800/70 hover:border-cyan-400/30 transition-all"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={ch.logo} alt={ch.name} className="h-8 w-auto object-contain" loading="lazy" />
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-white font-medium truncate block">{ch.name}</span>
+                    <span className="text-xs text-red-400 flex items-center gap-1 mt-0.5">
+                      <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                      LIVE
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
         </div>
       </main>
 

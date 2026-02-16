@@ -1,5 +1,4 @@
 import { tmdbFetch } from "@/lib/tmdb"
-import { getTvServers } from "@/lib/streaming"
 import WatchTvEpisodeClient from "./WatchTvEpisodeClient"
 
 type TvDetails = {
@@ -78,26 +77,24 @@ export default async function WatchTvEpisodePage({ params }: { params: RoutePara
   const showName = details?.name ?? 'TV Series'
   const seasons: SeasonSummary[] = Array.isArray(details?.seasons)
     ? details.seasons
-        .filter((season: any) => typeof season?.season_number === "number" && season.season_number > 0)
-        .map((season: any) => ({
-          season_number: season.season_number,
-          name: season.name || `Season ${season.season_number}`,
-          episode_count: season.episode_count
-        }))
+      .filter((season: any) => typeof season?.season_number === "number" && season.season_number > 0)
+      .map((season: any) => ({
+        season_number: season.season_number,
+        name: season.name || `Season ${season.season_number}`,
+        episode_count: season.episode_count
+      }))
     : []
 
   const episodes: EpisodeSummary[] = Array.isArray(seasonData?.episodes)
     ? seasonData.episodes.map((episode: any) => ({
-        episode_number: episode.episode_number,
-        name: episode.name,
-        overview: episode.overview,
-        still_path: episode.still_path,
-        runtime: episode.runtime,
-        air_date: episode.air_date
-      }))
+      episode_number: episode.episode_number,
+      name: episode.name,
+      overview: episode.overview,
+      still_path: episode.still_path,
+      runtime: episode.runtime,
+      air_date: episode.air_date
+    }))
     : []
-
-  const servers = getTvServers(id, String(seasonNumber), String(episodeNumber))
 
   return (
     <WatchTvEpisodeClient
@@ -107,7 +104,6 @@ export default async function WatchTvEpisodePage({ params }: { params: RoutePara
       details={details}
       seasons={seasons}
       episodes={episodes}
-      servers={servers}
     />
   )
 }

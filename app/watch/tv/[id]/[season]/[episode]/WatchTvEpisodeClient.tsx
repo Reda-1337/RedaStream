@@ -6,9 +6,7 @@ import Link from "next/link"
 
 import Header from "@/components/Header"
 import EnhancedFooter from "@/components/EnhancedFooter"
-import PlayerEmbed from "@/components/PlayerEmbed"
-
-import type { StreamServer } from "@/lib/streaming"
+import RivePlayer from "@/components/RivePlayer"
 
 type SeasonSummary = {
   season_number: number
@@ -32,7 +30,6 @@ type Props = {
   details: any | null
   seasons: SeasonSummary[]
   episodes: EpisodeSummary[]
-  servers: StreamServer[]
 }
 
 const FALLBACK_STILL = "https://image.tmdb.org/t/p/w300_and_h169_bestv2/9BO752hELUnx58hYgZjXMPaq0G7.jpg"
@@ -49,8 +46,7 @@ export default function WatchTvEpisodeClient({
   episodeNumber,
   details,
   seasons,
-  episodes,
-  servers
+  episodes
 }: Props) {
   const sortedEpisodes = useMemo(() => mapEpisodes(episodes), [episodes])
   const backdrop = details?.backdrop_path ? `https://image.tmdb.org/t/p/original${details.backdrop_path}` : null
@@ -138,7 +134,7 @@ export default function WatchTvEpisodeClient({
               )}
 
               <div className="space-y-3">
-                <PlayerEmbed initialServers={servers} />
+                <RivePlayer type="tv" tmdbId={id} season={seasonNumber} episode={episodeNumber} />
 
                 <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.3em] text-slate-400">
                   {previousEpisodeNumber ? (
@@ -179,11 +175,10 @@ export default function WatchTvEpisodeClient({
                           key={season.season_number}
                           href={`/watch/tv/${id}/${season.season_number}/1`}
                           prefetch={false}
-                          className={`rounded-full px-5 py-2 text-xs font-semibold transition ${
-                            isActive
+                          className={`rounded-full px-5 py-2 text-xs font-semibold transition ${isActive
                               ? "bg-cyan-500 text-slate-950 shadow-[0_10px_25px_rgba(6,182,212,0.35)]"
                               : "border border-slate-700/60 bg-slate-900/70 text-slate-300 hover:border-cyan-400/60 hover:text-white"
-                          }`}
+                            }`}
                         >
                           <span>{season.name}</span>
                           {typeof season.episode_count === "number" && (
@@ -220,11 +215,10 @@ export default function WatchTvEpisodeClient({
                           key={target}
                           href={`/watch/tv/${id}/${seasonNumber}/${target}`}
                           prefetch={false}
-                          className={`group overflow-hidden rounded-2xl border text-left transition ${
-                            isActive
+                          className={`group overflow-hidden rounded-2xl border text-left transition ${isActive
                               ? "border-cyan-400/60 bg-cyan-500/10 text-cyan-100"
                               : "border-slate-700/60 bg-slate-900/70 text-slate-300 hover:border-cyan-400/40 hover:text-white"
-                          }`}
+                            }`}
                         >
                           <div className="relative h-36 w-full overflow-hidden">
                             <Image

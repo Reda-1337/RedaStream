@@ -1,0 +1,128 @@
+# Agent Rules for RedaStream+
+
+## Core Rules
+1. **ALWAYS** read `AGENTS.md` at the start of every session
+2. **ALWAYS** read the target file before editing it
+3. **NEVER** modify files outside the task scope
+4. **NEVER** delete existing TMDB functions in `lib/tmdb.ts` — only add new ones
+5. **NEVER** hardcode API keys — use `process.env.VARIABLE_NAME`
+6. **NEVER** use `any` TypeScript type if you can infer the actual type
+7. **NEVER** break the existing color scheme (slate/cyan/indigo gradients)
+
+## Before Every Edit
+- Read the file you are about to change with `view_file`
+- Check if a component already exists that does what you need
+- Check `AGENTS.md` for naming conventions and existing patterns
+- Make sure imports will resolve correctly (use `@/components/*` and `@/lib/*`)
+- Check if the change requires updates to `next.config.js` (images, CSP)
+
+## File Creation Rules
+- **New pages** → `/app/[route]/page.tsx` (Server Component by default)
+- **Client interactivity** → Add `'use client'` at top + extract to `/components`
+- **API helpers** → Add to `/lib/tmdb.ts` or create `/lib/[service].ts`
+- **New types** → Add to existing file types or co-locate if specific to one file
+- **Components** → `/components/[ComponentName].tsx` (PascalCase)
+
+## Code Style Rules
+- **Match the exact coding style** of the existing codebase
+- **Use Tailwind classes** consistent with existing slate/cyan/indigo color scheme
+- **Use Next.js Image component** for all images (not `<img>` unless external iframe)
+- **Add revalidate times** to all fetch() calls: `{ next: { revalidate: 3600 } }`
+- **Client components** must start with `"use client"` directive
+- **Server components** should use async/await for data fetching
+- **Error handling** should use try/catch with fallback data when possible
+
+## TMDB API Rules
+- **Use `tmdbFetch()`** from `lib/tmdb.ts` for all TMDB calls
+- **Pass query params** as object, not in URL string
+- **Handle errors gracefully** with try/catch and fallback data
+- **Use type annotations** for TMDB responses (e.g., `tmdbFetch<MovieDetails>(...)`)
+- **K-Dramas**: Use `with_original_language=ko` on `/discover/tv`
+- **Anime**: Use `with_original_language=ja` + `with_genres=16` on `/discover/tv`
+
+## Component Patterns
+- **Content rows**: Use `ContentSection.tsx` for horizontal scrolling
+- **Grids**: Use `MediaGrid.tsx` for poster grids
+- **Cards**: Use `MediaCard.tsx` for individual items
+- **Filters**: Use `FiltersBar.tsx` pattern for genre/year/language
+- **Loading**: Use `LoadingSkeleton.tsx` with appropriate type prop
+- **Errors**: Wrap sections in `ErrorBoundary.tsx` from `@/components/ErrorBoundary`
+
+## Styling Patterns
+- **Backgrounds**: `bg-slate-950`, `bg-slate-900/80`, gradients with `from-black via-slate-950 to-black`
+- **Borders**: `border-slate-800/60`, rounded with `rounded-3xl` or `rounded-2xl`
+- **Text**: `text-white` for headings, `text-slate-300` for body, `text-slate-400` for muted
+- **Buttons**: `bg-cyan-500` for primary, `bg-slate-900/70` for secondary
+- **Hover states**: Use `hover:` with slight color shifts or `-translate-y-0.5`
+- **Shadows**: Use `shadow-[0_20px_80px_rgba(...)]` for glass morphism
+
+## Player & Streaming Rules
+- **Current player**: `PlayerEmbed.tsx` uses iframe embeds (will be replaced)
+- **New player**: `RivePlayer.tsx` should follow same API pattern (initialServers prop)
+- **Server switching**: Always provide multiple servers with priority ordering
+- **Iframe attributes**: Include `allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"` and `allowFullScreen`
+
+## Route & Navigation Rules
+- **Movies**: `/movies` → Movie catalog with filters
+- **TV Shows**: `/tv` → TV catalog with filters
+- **K-Dramas**: `/kdramas` → Korean dramas (TV with `with_original_language=ko`)
+- **Anime**: `/anime` → Japanese animation (TV with `with_original_language=ja` + anime genre)
+- **Manga**: `/manga` → Manga from Kitsu.io API
+- **Live TV**: `/live` → IPTV channels browser
+- **Watch pages**: `/watch/movie/[id]` and `/watch/tv/[id]/[season]/[episode]`
+
+## next.config.js Rules
+- **Image domains**: Add any new external image sources to `remotePatterns`
+- **CSP frame-src**: Add new iframe sources to `ALLOWED_IFRAME_ORIGINS` or headers
+- **Don't break CSP**: Test after adding new domains
+
+## When Something Breaks
+1. **Read the error message fully** before guessing
+2. **Check if the issue is a missing import** (use correct `@/` aliases)
+3. **Check if it's a missing env variable** (see `AGENTS.md`)
+4. **Check if it's a Next.js config issue** (domains, headers, CSP)
+5. **Check if it's a client/server component mismatch** ('use client' needed?)
+6. **Do NOT randomly try fixes** — diagnose first, then fix
+
+## Testing Rules
+- **Manual browser testing**: Run `npm run dev` and navigate to the route
+- **Check console**: Look for errors in browser console and terminal
+- **Test edge cases**: Empty results, missing data, slow network
+- **Test responsive**: Mobile, tablet, desktop viewports
+- **Test player**: Ensure video loads and server switching works
+
+## Commit Style (if using git)
+- `feat: add RivePlayer component`
+- `feat: add K-Dramas page with Korean language filter`
+- `feat: add Kitsu.io manga integration`
+- `feat: add IPTV live channels with HLS.js player`
+- `fix: add rivestream to next.config image domains`
+- `fix: correct server switching in RivePlayer`
+- `chore: update AGENTS md with new routes`
+- `refactor: consolidate search components`
+
+## Performance Rules
+- **Use Server Components** for static/SSR content (default in App Router)
+- **Use Client Components** only when needed (interactive, useState, etc.)
+- **Cache TMDB responses** with `next: { revalidate: 300 }` or appropriate TTL
+- **Lazy load images** with Next.js Image component (automatic)
+- **Limit initial page weight** by slicing arrays (e.g., `.slice(0, 20)`)
+
+## Accessibility Rules
+- **Use semantic HTML**: `<header>`, `<nav>`, `<main>`, `<footer>`, `<section>`
+- **Alt text for images**: Always provide descriptive alt text
+- **Button labels**: Use aria-label when icon-only buttons
+- **Focus states**: Include focus-visible styles for keyboard navigation
+- **Color contrast**: Ensure text meets WCAG contrast requirements
+
+## Anti-Patterns to Avoid
+- ❌ Don't create duplicate components (check existing first)
+- ❌ Don't hardcode data (use TMDB/Kitsu/IPTV APIs)
+- ❌ Don't skip error handling (always try/catch API calls)
+- ❌ Don't use inline styles (use Tailwind classes)
+- ❌ Don't break existing pages (test before deploying)
+- ❌ Don't ignore TypeScript errors (fix them properly)
+- ❌ Don't add unnecessary dependencies (use existing ones)
+
+## Remember
+> "If you're not sure, check AGENTS.md. If still not sure, read the code. If still not sure, ask the user."

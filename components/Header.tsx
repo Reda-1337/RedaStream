@@ -4,12 +4,16 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useState, type FormEvent } from "react"
-import { Film, Home, Layers, Search, User, Bell, Settings } from "lucide-react"
+import { Film, Home, Layers, Search, User, Bell, Settings, Tv, BookOpen, Radio } from "lucide-react"
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
   { href: "/movies", label: "Movies", icon: Film },
-  { href: "/tv", label: "TV Series", icon: Layers }
+  { href: "/tv", label: "TV Series", icon: Layers },
+  { href: "/kdramas", label: "K-Dramas", icon: Tv },
+  { href: "/anime", label: "Anime", icon: Layers },
+  { href: "/manga", label: "Manga", icon: BookOpen },
+  { href: "/live", label: "Live TV", icon: Radio },
 ] as const
 
 export default function Header() {
@@ -100,11 +104,10 @@ export default function Header() {
             <Link
               key={href}
               href={href as any}
-              className={`inline-flex flex-shrink-0 items-center gap-2 rounded-full border px-4 py-2 transition ${
-                isActive
+              className={`inline-flex flex-shrink-0 items-center gap-2 rounded-full border px-4 py-2 transition ${isActive
                   ? 'border-cyan-400/60 bg-cyan-500/10 text-cyan-100'
                   : 'border-transparent bg-slate-900/50 text-slate-300 hover:border-slate-700/60 hover:text-white'
-              }`}
+                }`}
             >
               <Icon className="h-4 w-4" />
               {label}

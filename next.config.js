@@ -1,32 +1,4 @@
 /** @type {import('next').NextConfig} */
-function parseOrigins(value) {
-  return (value || '')
-    .split(/[\s,]+/)
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .join(' ')
-}
-
-const DEFAULT_IFRAME_ORIGINS = [
-  'https://vidsrc.to',
-  'https://*.vidsrc.to',
-  'https://vidsrc.vip',
-  'https://*.vidsrc.vip',
-  'https://vidsrc.xyz',
-  'https://*.vidsrc.xyz',
-  'https://vidlink.pro',
-  'https://*.vidlink.pro',
-  'https://vidnest.fun',
-  'https://*.vidnest.fun',
-  'https://multiembed.mov',
-  'https://*.multiembed.mov',
-  'https://autoembed.to',
-  'https://*.autoembed.to',
-  'https://cloudnestra.com',
-  'https://*.cloudnestra.com',
-  'https://player.videasy.net'
-].join(',')
-
 const nextConfig = {
   webpack(config, { dev }) {
     if (dev) {
@@ -39,36 +11,54 @@ const nextConfig = {
     remotePatterns: [
       { protocol: 'https', hostname: 'image.tmdb.org' },
       { protocol: 'https', hostname: 'via.placeholder.com' },
-      { protocol: 'https', hostname: 'www.themoviedb.org' }
+      { protocol: 'https', hostname: 'www.themoviedb.org' },
+      { protocol: 'https', hostname: 'media.kitsu.app' },
+      { protocol: 'https', hostname: '*.kitsu.app' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org' }
     ]
   },
+  /**
+   * 🛡️ LAYER 5 — next.config.js hardening
+   *
+   * Backup security headers applied at the Next.js config level.
+   * The middleware also sets CSP; these act as a second line of defense,
+   * plus they add COOP/COEP specifically for watch pages.
+   */
   async headers() {
-    const rawOrigins = [DEFAULT_IFRAME_ORIGINS, process.env.ALLOWED_IFRAME_ORIGINS]
-      .filter(Boolean)
-      .join(',')
-    const allowedFrames = parseOrigins(rawOrigins)
-
-    const csp = [
-      "default-src 'self'",
-      "img-src 'self' https: data:",
-      "style-src 'self' 'unsafe-inline'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
-      `frame-src 'self' ${allowedFrames}`,
-      "connect-src 'self' https://api.themoviedb.org https://image.tmdb.org",
-      "font-src 'self' data:"
-    ].join('; ')
-
     return [
       {
         source: '/:path*',
         headers: [
-          { key: 'Content-Security-Policy', value: csp }
-        ]
-      }
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'off', // Prevent DNS prefetch to ad domains
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=(), payment=()',
+          },
+        ],
+      },
+      // Tightest restrictions on watch pages
+      {
+        source: '/watch/:path*',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin', // Isolates page from popup windows
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'unsafe-none', // Keep — allows Rivestream iframe
+          },
+        ],
+      },
     ]
-  }
+  },
 }
 
 module.exports = nextConfig
-
-
