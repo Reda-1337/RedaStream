@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import FiltersBar from '@/components/FiltersBar'
+import ProviderFilter from '@/components/ProviderFilter'
 import { FALLBACK_MOVIES } from '@/components/home/fallbackData'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import CatalogResults from '@/components/CatalogResults'
@@ -193,6 +194,10 @@ export default async function MoviesPage({ searchParams }: { searchParams: Searc
         </section>
 
         <section>
+          <Suspense fallback={null}>
+            <ProviderFilter />
+          </Suspense>
+
           <Suspense fallback={<FiltersSkeleton />}>
             <FiltersBar type="movie" initialGenres={filters.movieGenres} initialYears={filters.years} />
           </Suspense>

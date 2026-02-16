@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic'
 import Link from 'next/link'
 import Header from '@/components/Header'
 import FiltersBar from '@/components/FiltersBar'
+import ProviderFilter from '@/components/ProviderFilter'
 import { FALLBACK_TV } from '@/components/home/fallbackData'
 import EnhancedFooter from '@/components/EnhancedFooter'
 import CatalogResults from '@/components/CatalogResults'
@@ -194,6 +195,10 @@ export default async function TvPage({ searchParams }: { searchParams: SearchPar
         </section>
 
         <section>
+          <Suspense fallback={null}>
+            <ProviderFilter />
+          </Suspense>
+
           <Suspense fallback={<FiltersSkeleton />}>
             <FiltersBar type="tv" initialGenres={filters.tvGenres} initialYears={filters.years} />
           </Suspense>
