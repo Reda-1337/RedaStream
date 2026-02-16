@@ -14,7 +14,7 @@ type Item = {
 export default function MediaGrid({ items }: { items: Item[] }) {
   const safeItems = (items || []).filter((i) => i && (i.media_type !== 'person'))
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 xl:gap-6">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 xl:gap-6 2xl:gap-7">
       {safeItems.map((item) => {
         const title = item.title || item.name || 'Untitled'
         const date = item.release_date || item.first_air_date || ''

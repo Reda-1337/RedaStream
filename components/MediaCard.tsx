@@ -38,7 +38,7 @@ export default function MediaCard({ id, title, posterPath, year, rating, mediaTy
   return (
     <Link
       href={detailHref as any}
-      className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/80"
+      className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/80 focus-visible:rounded-2xl focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
     >
       <div className="glass-card overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_25px_45px_rgba(8,47,73,0.45)]">
         <div className="relative aspect-[2/3] overflow-hidden">
@@ -46,7 +46,7 @@ export default function MediaCard({ id, title, posterPath, year, rating, mediaTy
             src={posterSrc}
             alt={title}
             fill
-            sizes="(max-width:768px) 50vw, (max-width:1200px) 20vw, 18vw"
+            sizes="(max-width:768px) 50vw, (max-width:1200px) 20vw, (max-width:1600px) 18vw, 14vw"
             className="object-cover transition-all duration-500 group-hover:scale-110"
             priority={false}
             onError={(event) => {
@@ -84,7 +84,7 @@ export default function MediaCard({ id, title, posterPath, year, rating, mediaTy
         </div>
 
         <div className="space-y-2 px-4 pb-4 pt-3">
-          <h3 className="line-clamp-2 text-sm font-semibold text-white transition-colors duration-200 group-hover:text-cyan-200">
+          <h3 className="line-clamp-2 text-sm font-semibold text-white transition-colors duration-200 group-hover:text-cyan-200 2xl:text-base">
             {title}
           </h3>
         </div>
