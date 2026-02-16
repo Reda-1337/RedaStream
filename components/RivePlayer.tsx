@@ -2,7 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 
-type PlayerType = 'standard' | 'torrent' | 'agg'
+type PlayerType = 'standard' | 'torrent' | 'agg' | 'nova'
 
 interface RivePlayerProps {
     type: 'movie' | 'tv'
@@ -19,7 +19,8 @@ function buildUrl(playerType: PlayerType, props: RivePlayerProps): string {
     const path =
         playerType === 'standard' ? '/embed'
             : playerType === 'torrent' ? '/embed/torrent'
-                : '/embed/agg'
+                : playerType === 'nova' ? '/embed/nova'
+                    : '/embed/agg'
     if (type === 'movie') return `${RIVE_BASE}${path}?type=movie&id=${tmdbId}`
     return `${RIVE_BASE}${path}?type=tv&id=${tmdbId}&season=${season ?? 1}&episode=${episode ?? 1}`
 }
@@ -32,9 +33,12 @@ function buildDownloadUrl(props: RivePlayerProps): string {
 
 const SERVERS: { id: PlayerType; label: string; badge: string; desc: string }[] = [
     { id: 'standard', label: 'Standard', badge: '⚡', desc: 'Fastest CDN servers with subtitles' },
+    { id: 'nova', label: 'Nova', badge: '🌍', desc: 'Multi-language subtitles including Arabic' },
     { id: 'torrent', label: 'Torrent', badge: '🧲', desc: 'Highest quality (up to 4K)' },
     { id: 'agg', label: 'Multi-Server', badge: '🔀', desc: 'Aggregator fallback' },
 ]
+
+const SERVER_ORDER: PlayerType[] = ['standard', 'nova', 'torrent', 'agg']
 
 type LoadState = 'loading' | 'loaded' | 'slow' | 'error'
 
@@ -42,6 +46,7 @@ export default function RivePlayer(props: RivePlayerProps) {
     const [server, setServer] = useState<PlayerType>('standard')
     const [loadState, setLoadState] = useState<LoadState>('loading')
     const [retryCount, setRetryCount] = useState(0)
+    const [autoSwitchCount, setAutoSwitchCount] = useState(0)
 
     const iframeRef = useRef<HTMLIFrameElement>(null)
     const shieldRef = useRef<HTMLDivElement>(null)
@@ -56,6 +61,17 @@ export default function RivePlayer(props: RivePlayerProps) {
         if (errorTimer.current) { clearTimeout(errorTimer.current); errorTimer.current = null }
     }, [])
 
+    // Auto-switch to next server on error (up to 2 auto-switches)
+    const autoSwitchServer = useCallback(() => {
+        if (autoSwitchCount >= 2) return // stop after 2 auto-switches
+        const currentIdx = SERVER_ORDER.indexOf(server)
+        const nextIdx = (currentIdx + 1) % SERVER_ORDER.length
+        setServer(SERVER_ORDER[nextIdx])
+        setRetryCount(0)
+        setAutoSwitchCount((c) => c + 1)
+        clearTimers()
+    }, [server, autoSwitchCount, clearTimers])
+
     // Start timeout-based load detection when URL changes
     useEffect(() => {
         setLoadState('loading')
@@ -64,11 +80,17 @@ export default function RivePlayer(props: RivePlayerProps) {
         // After 12s — show "taking a while" (amber, not error)
         slowTimer.current = setTimeout(() => setLoadState('slow'), 12000)
 
-        // After 25s — show error with retry options
-        errorTimer.current = setTimeout(() => setLoadState('error'), 25000)
+        // After 25s — auto-switch if possible, otherwise show error
+        errorTimer.current = setTimeout(() => {
+            if (autoSwitchCount < 2) {
+                autoSwitchServer()
+            } else {
+                setLoadState('error')
+            }
+        }, 25000)
 
         return clearTimers
-    }, [embedUrl, retryCount, clearTimers])
+    }, [embedUrl, retryCount, clearTimers, autoSwitchCount, autoSwitchServer])
 
     const handleLoaded = useCallback(() => {
         clearTimers()
@@ -78,6 +100,7 @@ export default function RivePlayer(props: RivePlayerProps) {
     const handleServerChange = useCallback((id: PlayerType) => {
         setServer(id)
         setRetryCount(0)
+        setAutoSwitchCount(0) // reset auto-switch counter on manual switch
         clearTimers()
     }, [clearTimers])
 
@@ -148,6 +171,9 @@ export default function RivePlayer(props: RivePlayerProps) {
                             <div className="text-center">
                                 <p className="text-sm font-medium text-white/80">Loading player…</p>
                                 <p className="text-xs text-slate-500 mt-1">Connecting to {SERVERS.find(s => s.id === server)?.label} server</p>
+                                {autoSwitchCount > 0 && (
+                                    <p className="text-xs text-amber-400/70 mt-1">Auto-switched {autoSwitchCount}x</p>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -164,7 +190,7 @@ export default function RivePlayer(props: RivePlayerProps) {
                                 <p className="text-white font-semibold">Taking a moment…</p>
                                 <p className="text-slate-400 text-sm mt-1">The server is responding slowly. You can wait or try another server.</p>
                             </div>
-                            <div className="flex gap-2 mt-1">
+                            <div className="flex flex-wrap gap-2 mt-1 justify-center">
                                 <button
                                     onClick={handleRetry}
                                     className="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/30 text-amber-200 text-sm font-medium hover:bg-amber-500/30 transition"
@@ -196,7 +222,7 @@ export default function RivePlayer(props: RivePlayerProps) {
                                 <p className="text-white font-semibold">Server not responding</p>
                                 <p className="text-slate-400 text-sm mt-1">This server may be down. Try a different one below.</p>
                             </div>
-                            <div className="flex gap-2 mt-1">
+                            <div className="flex flex-wrap gap-2 mt-1 justify-center">
                                 <button
                                     onClick={handleRetry}
                                     className="px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/30 text-red-200 text-sm font-medium hover:bg-red-500/30 transition"
@@ -241,7 +267,7 @@ export default function RivePlayer(props: RivePlayerProps) {
 
             {/* ── Info Bar ── */}
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
-                <span>⚙️ Subtitles & quality settings available in the player menu</span>
+                <span>⚙️ Subtitles & quality settings available in the player menu — try <strong className="text-cyan-400/70">Nova</strong> server for Arabic subs</span>
                 <span className="flex items-center gap-1.5">
                     🛡️ <span className="text-emerald-500/80">Ad-protected</span>
                 </span>
