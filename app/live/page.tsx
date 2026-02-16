@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useMemo } from 'react'
 import Header from '@/components/Header'
 import EnhancedFooter from '@/components/EnhancedFooter'
@@ -64,8 +66,8 @@ export default function LiveTVPage() {
                                 key={cat}
                                 onClick={() => setActiveCategory(cat)}
                                 className={`px-5 py-2 rounded-full whitespace-nowrap text-sm font-medium transition-all duration-300 ${activeCategory === cat
-                                        ? 'bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)] transform scale-105'
-                                        : 'bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800/50'
+                                    ? 'bg-cyan-500 text-black shadow-[0_0_20px_rgba(6,182,212,0.4)] transform scale-105'
+                                    : 'bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-white border border-slate-800/50'
                                     }`}
                             >
                                 {cat}
@@ -80,8 +82,8 @@ export default function LiveTVPage() {
                                 key={lang}
                                 onClick={() => setActiveLanguage(lang)}
                                 className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${activeLanguage === lang
-                                        ? 'bg-slate-800 text-white shadow-sm'
-                                        : 'text-slate-500 hover:text-slate-300'
+                                    ? 'bg-slate-800 text-white shadow-sm'
+                                    : 'text-slate-500 hover:text-slate-300'
                                     }`}
                             >
                                 {lang === 'All' ? 'All' : lang.toUpperCase()}
