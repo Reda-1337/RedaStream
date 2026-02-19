@@ -18,91 +18,118 @@ type Props = {
   episode?: number
 }
 
-export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props) {
-  const [mode, setMode] = useState<"new" | "legacy">("new")
-  const [legacyServers, setLegacyServers] = useState<RawServer[]>([])
-  const [loadingLegacy, setLoadingLegacy] = useState(false)
-  const [legacyError, setLegacyError] = useState<string | null>(null)
+type Mode = "api" | "backup"
+const MODE_KEY = "redastream_player_mode"
 
-  const legacyPath = useMemo(() => {
+export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props) {
+  const [mode, setMode] = useState<Mode>("api")
+  const [apiServers, setApiServers] = useState<RawServer[]>([])
+  const [loadingApi, setLoadingApi] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
+
+  const apiPath = useMemo(() => {
     if (type === "movie") return `/api/stream/movie/${tmdbId}`
     if (!season || !episode) return null
     return `/api/stream/tv/${tmdbId}/${season}/${episode}`
   }, [type, tmdbId, season, episode])
 
   useEffect(() => {
-    if (mode !== "legacy" || !legacyPath || legacyServers.length > 0 || loadingLegacy) return
+    try {
+      const saved = window.localStorage.getItem(MODE_KEY) as Mode | null
+      if (saved === "api" || saved === "backup") setMode(saved)
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(MODE_KEY, mode)
+    } catch {}
+  }, [mode])
+
+  useEffect(() => {
+    if (!apiPath || apiServers.length > 0 || loadingApi) return
 
     let cancelled = false
 
-    const loadLegacy = async () => {
+    const loadApiServers = async () => {
       try {
-        setLoadingLegacy(true)
-        setLegacyError(null)
+        setLoadingApi(true)
+        setApiError(null)
 
-        const res = await fetch(legacyPath, { cache: "no-store" })
-        if (!res.ok) throw new Error(`Legacy API failed (${res.status})`)
+        const res = await fetch(apiPath, { cache: "no-store" })
+        if (!res.ok) throw new Error(`API player failed (${res.status})`)
 
         const data = await res.json()
         const servers = Array.isArray(data?.servers) ? data.servers : []
 
-        if (!cancelled) setLegacyServers(servers)
+        if (!cancelled) {
+          setApiServers(servers)
+          if (servers.length === 0) {
+            setApiError("No API servers available for this title")
+            setMode("backup")
+          }
+        }
       } catch (err: any) {
         if (!cancelled) {
-          setLegacyError(err?.message || "Failed to load legacy servers")
-          setLegacyServers([])
+          setApiError(err?.message || "Failed to load API servers")
+          setApiServers([])
+          setMode("backup")
         }
       } finally {
-        if (!cancelled) setLoadingLegacy(false)
+        if (!cancelled) setLoadingApi(false)
       }
     }
 
-    loadLegacy()
+    loadApiServers()
 
     return () => {
       cancelled = true
     }
-  }, [mode, legacyPath, legacyServers.length, loadingLegacy])
+  }, [apiPath, apiServers.length, loadingApi])
 
   return (
     <div className="space-y-4">
       <div className="inline-flex rounded-xl border border-slate-800/70 bg-slate-900/60 p-1">
         <button
           type="button"
-          onClick={() => setMode("new")}
-          className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
-            mode === "new"
+          onClick={() => setMode("api")}
+          className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition ${
+            mode === "api"
               ? "bg-cyan-500 text-slate-950"
               : "text-slate-400 hover:text-white"
           }`}
         >
-          New Player
+          API Player (Recommended)
         </button>
         <button
           type="button"
-          onClick={() => setMode("legacy")}
-          className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] transition ${
-            mode === "legacy"
+          onClick={() => setMode("backup")}
+          className={`rounded-lg px-4 py-2 text-xs font-semibold uppercase tracking-[0.15em] transition ${
+            mode === "backup"
               ? "bg-cyan-500 text-slate-950"
               : "text-slate-400 hover:text-white"
           }`}
         >
-          Legacy API Players
+          Backup Player
         </button>
       </div>
 
-      {mode === "new" ? (
-        <RivePlayer type={type} tmdbId={tmdbId} season={season} episode={episode} />
-      ) : loadingLegacy ? (
-        <div className="rounded-3xl border border-slate-800/60 bg-slate-950 px-6 py-10 text-center text-sm text-slate-300">
-          Loading legacy servers...
+      {apiError && mode === "api" && (
+        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          {apiError} — switched to backup when needed.
         </div>
-      ) : legacyError ? (
-        <div className="rounded-3xl border border-rose-500/30 bg-rose-950/20 px-6 py-10 text-center text-sm text-rose-200">
-          {legacyError}
-        </div>
+      )}
+
+      {mode === "api" ? (
+        loadingApi ? (
+          <div className="rounded-3xl border border-slate-800/60 bg-slate-950 px-6 py-10 text-center text-sm text-slate-300">
+            Loading API servers...
+          </div>
+        ) : (
+          <PlayerEmbed initialServers={apiServers} />
+        )
       ) : (
-        <PlayerEmbed initialServers={legacyServers} />
+        <RivePlayer type={type} tmdbId={tmdbId} season={season} episode={episode} />
       )}
     </div>
   )
