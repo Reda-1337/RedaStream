@@ -1,4 +1,4 @@
-﻿"use client"
+"use client"
 
 import { useMemo, useState } from "react"
 
@@ -80,7 +80,7 @@ export default function PlayerEmbed({ initialServers }: Props) {
           allow={IFRAME_ALLOW_ATTRS}
           allowFullScreen
           referrerPolicy="origin-when-cross-origin"
-          className="aspect-video h-full w-full"
+          className="aspect-video h-full w-full" sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
         />
       </div>
 

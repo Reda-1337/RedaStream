@@ -4,7 +4,7 @@ Write-Host "Testing Website Functionality..." -ForegroundColor Cyan
 # Test Homepage
 Write-Host "`n1. Testing Homepage..." -ForegroundColor Yellow
 try {
-    $homepage = Invoke-WebRequest -Uri "http://localhost:3001/" -UseBasicParsing
+    $homepage = Invoke-WebRequest -Uri "http://localhost:3005/" -UseBasicParsing
     if ($homepage.StatusCode -eq 200) {
         Write-Host "   Homepage loads successfully" -ForegroundColor Green
     } else {
@@ -17,7 +17,7 @@ try {
 # Test Search API
 Write-Host "`n2. Testing Search API..." -ForegroundColor Yellow
 try {
-    $search = Invoke-WebRequest -Uri "http://localhost:3001/api/search?q=batman" -UseBasicParsing
+    $search = Invoke-WebRequest -Uri "http://localhost:3005/api/search?q=batman" -UseBasicParsing
     if ($search.StatusCode -eq 200) {
         $data = $search.Content | ConvertFrom-Json
         if ($data.results -and $data.results.Count -gt 0) {

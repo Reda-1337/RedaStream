@@ -30,11 +30,11 @@ body {
 
 /* ── Glass variants ── */
 .glass-panel {
-  @apply bg-slate-900/60 backdrop-blur-xl border border-slate-700/40 shadow-[0_20px_60px_rgba(15,23,42,0.4)] rounded-3xl;
+  @apply bg-slate-900/60 backdrop-blur-xl border border-slate-700/40 shadow-[0_20px_60px_rgba(15, 23, 42, 0.4)] rounded-3xl;
 }
 
 .glass-card {
-  @apply bg-slate-900/50 backdrop-blur-lg border border-slate-700/30 shadow-[0_12px_30px_rgba(8,47,73,0.35)] rounded-2xl;
+  @apply bg-slate-900/50 backdrop-blur-lg border border-slate-700/30 shadow-[0_12px_30px_rgba(8, 47, 73, 0.35)] rounded-2xl;
 }
 
 .badge-pill {
@@ -45,57 +45,95 @@ body {
 .player-glow {
   position: relative;
 }
+
 .player-glow::before {
   content: '';
   position: absolute;
   inset: -1px;
   border-radius: inherit;
-  background: linear-gradient(
-    135deg,
-    rgba(239, 68, 68, 0.3),
-    rgba(168, 85, 247, 0.2),
-    rgba(14, 165, 233, 0.3),
-    rgba(239, 68, 68, 0.2)
-  );
+  background: linear-gradient(135deg,
+      rgba(239, 68, 68, 0.3),
+      rgba(168, 85, 247, 0.2),
+      rgba(14, 165, 233, 0.3),
+      rgba(239, 68, 68, 0.2));
   background-size: 300% 300%;
   animation: shimmer-border 6s ease infinite;
   z-index: -1;
   opacity: 0.6;
 }
+
 .player-glow:hover::before {
   opacity: 1;
 }
 
 @keyframes shimmer-border {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* ── Glow pulse for active elements ── */
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(var(--accent), 0.2), 0 0 20px rgba(var(--accent), 0.1); }
-  50% { box-shadow: 0 0 16px rgba(var(--accent), 0.4), 0 0 40px rgba(var(--accent), 0.15); }
+
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(var(--accent), 0.2), 0 0 20px rgba(var(--accent), 0.1);
+  }
+
+  50% {
+    box-shadow: 0 0 16px rgba(var(--accent), 0.4), 0 0 40px rgba(var(--accent), 0.15);
+  }
 }
+
 .glow-pulse {
   animation: glow-pulse 2s ease-in-out infinite;
 }
 
 /* ── Slide-up entry animation ── */
 @keyframes slide-up {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .slide-up {
   animation: slide-up 0.5s ease-out both;
 }
-.slide-up-delay-1 { animation-delay: 0.1s; }
-.slide-up-delay-2 { animation-delay: 0.2s; }
-.slide-up-delay-3 { animation-delay: 0.3s; }
+
+.slide-up-delay-1 {
+  animation-delay: 0.1s;
+}
+
+.slide-up-delay-2 {
+  animation-delay: 0.2s;
+}
+
+.slide-up-delay-3 {
+  animation-delay: 0.3s;
+}
+
+
+/* ── Focus Styles for TV/Keyboard ── */
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400 focus-visible:ring-offset-4 focus-visible:ring-offset-slate-950 transition-all duration-200;
+}
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -103,12 +141,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.4);
+  background: rgba(100, 116, 139, 0.2);
   border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.7);
+  background-color: rgba(148, 163, 184, 0.5);
 }
 
 .scrollbar-hide {
@@ -122,8 +162,13 @@ body {
 
 /* ── Skeleton loading ── */
 @keyframes skeleton-loading {
-  0% { background-position: -200px 0; }
-  100% { background-position: calc(200px + 100%) 0; }
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
 }
 
 .skeleton {
@@ -134,8 +179,15 @@ body {
 
 /* ── Fade in ── */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .fade-in {
@@ -144,16 +196,30 @@ body {
 
 /* ── Ken Burns for hero ── */
 @keyframes kenburns {
-  0% { transform: scale(1.05); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1.05); }
+  0% {
+    transform: scale(1.05);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+
+  100% {
+    transform: scale(1.05);
+  }
 }
 
 /* ── Nav active underline ── */
 @keyframes nav-underline {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
 }
+
 .nav-active-line {
   transform-origin: left;
   animation: nav-underline 0.3s ease-out forwards;
@@ -163,6 +229,7 @@ body {
 .hover-lift {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
+
 .hover-lift:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);

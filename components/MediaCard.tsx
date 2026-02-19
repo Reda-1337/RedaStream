@@ -38,9 +38,9 @@ export default function MediaCard({ id, title, posterPath, year, rating, mediaTy
   return (
     <Link
       href={detailHref as any}
-      className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400/80 focus-visible:rounded-2xl focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+      className="group block rounded-2xl focus-ring focus-visible:scale-105"
     >
-      <div className="glass-card overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_25px_45px_rgba(8,47,73,0.45)]">
+      <div className="glass-card overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_25px_45px_rgba(8,47,73,0.45)] group-focus-visible:shadow-[0_0_0_4px_rgba(34,211,238,0.4)]">
         <div className="relative aspect-[2/3] overflow-hidden">
           <Image
             src={posterSrc}

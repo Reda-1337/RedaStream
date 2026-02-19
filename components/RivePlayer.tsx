@@ -108,7 +108,7 @@ export default function RivePlayer(props: RivePlayerProps) {
         setRetryCount((c) => c + 1)
     }, [])
 
-    // Click shield for ad protection
+    // Interaction shield to reduce accidental popups
     const handleShieldClick = useCallback(() => {
         const shield = shieldRef.current
         if (!shield) return
@@ -122,22 +122,22 @@ export default function RivePlayer(props: RivePlayerProps) {
         <div className="w-full flex flex-col gap-4">
 
             {/* ── Server Bar ── */}
-            <div className="flex flex-wrap items-center gap-2">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-1">Server</span>
+            <div className="flex flex-wrap items-center gap-3">
+                <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider mr-1 hidden sm:inline-block">Server</span>
                 {SERVERS.map((s) => (
                     <button
                         key={s.id}
                         onClick={() => handleServerChange(s.id)}
                         title={s.desc}
                         className={`
-              relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold
-              transition-all duration-300 select-none
+              relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
+              transition-all duration-300 select-none focus-ring
               ${server === s.id
                                 ? 'bg-gradient-to-r from-red-600 to-rose-500 text-white shadow-[0_4px_20px_rgba(239,68,68,0.4)] scale-[1.03]'
                                 : 'bg-slate-800/80 text-slate-400 hover:bg-slate-700 hover:text-white hover:scale-[1.02]'}
             `}
                     >
-                        <span>{s.badge}</span>
+                        <span className="text-base">{s.badge}</span>
                         <span>{s.label}</span>
                         {server === s.id && loadState === 'loading' && (
                             <span className="inline-block w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse ml-1" />
@@ -252,10 +252,10 @@ export default function RivePlayer(props: RivePlayerProps) {
                     allowFullScreen
                     allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write"
                     referrerPolicy="origin"
-                    onLoad={handleLoaded}
+                    onLoad={handleLoaded} sandbox="allow-scripts allow-same-origin allow-forms allow-presentation"
                 />
 
-                {/* Click shield for ad protection */}
+                {/* Interaction shield to reduce accidental popups */}
                 <div
                     ref={shieldRef}
                     className="absolute inset-0 z-20"
@@ -269,7 +269,7 @@ export default function RivePlayer(props: RivePlayerProps) {
             <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
                 <span>⚙️ Subtitles & quality settings available in the player menu — try <strong className="text-cyan-400/70">Nova</strong> server for Arabic subs</span>
                 <span className="flex items-center gap-1.5">
-                    🛡️ <span className="text-emerald-500/80">Ad-protected</span>
+                    🛡️ <span className="text-emerald-500/80">Protected mode</span>
                 </span>
             </div>
         </div>
