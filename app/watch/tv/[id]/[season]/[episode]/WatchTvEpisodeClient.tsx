@@ -6,7 +6,7 @@ import Link from "next/link"
 
 import Header from "@/components/Header"
 import EnhancedFooter from "@/components/EnhancedFooter"
-import RivePlayer from "@/components/RivePlayer"
+import PlayerSwitcher from "@/components/PlayerSwitcher"
 
 type SeasonSummary = {
   season_number: number
@@ -134,7 +134,7 @@ export default function WatchTvEpisodeClient({
               )}
 
               <div className="space-y-3">
-                <RivePlayer type="tv" tmdbId={id} season={seasonNumber} episode={episodeNumber} />
+                <PlayerSwitcher type="tv" tmdbId={id} season={seasonNumber} episode={episodeNumber} />
 
                 <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.3em] text-slate-400">
                   {previousEpisodeNumber ? (

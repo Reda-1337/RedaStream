@@ -3,7 +3,7 @@ import Link from "next/link"
 
 import Header from "@/components/Header"
 import EnhancedFooter from "@/components/EnhancedFooter"
-import RivePlayer from "@/components/RivePlayer"
+import PlayerSwitcher from "@/components/PlayerSwitcher"
 import MediaGrid from "@/components/MediaGrid"
 import { tmdbFetch } from "@/lib/tmdb"
 
@@ -111,7 +111,7 @@ export default async function WatchMoviePage({ params }: { params: { id: string 
               )}
 
               <div className="mt-6">
-                <RivePlayer type="movie" tmdbId={params.id} />
+                <PlayerSwitcher type="movie" tmdbId={params.id} />
               </div>
             </div>
           </div>
