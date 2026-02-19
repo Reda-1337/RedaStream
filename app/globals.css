@@ -28,20 +28,20 @@ body {
   color: #e2e8f0;
 }
 
-/* ── Glass variants ── */
+/* â”€â”€ Glass variants â”€â”€ */
 .glass-panel {
-  @apply bg-slate-900/60 backdrop-blur-xl border border-slate-700/40 shadow-[0_20px_60px_rgba(15, 23, 42, 0.4)] rounded-3xl;
+  @apply bg-slate-900/60 backdrop-blur-xl border border-slate-700/40 shadow-2xl rounded-3xl;
 }
 
 .glass-card {
-  @apply bg-slate-900/50 backdrop-blur-lg border border-slate-700/30 shadow-[0_12px_30px_rgba(8, 47, 73, 0.35)] rounded-2xl;
+  @apply bg-slate-900/50 backdrop-blur-lg border border-slate-700/30 shadow-xl rounded-2xl;
 }
 
 .badge-pill {
   @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide;
 }
 
-/* ── Player glow border ── */
+/* â”€â”€ Player glow border â”€â”€ */
 .player-glow {
   position: relative;
 }
@@ -78,7 +78,7 @@ body {
   }
 }
 
-/* ── Glow pulse for active elements ── */
+/* â”€â”€ Glow pulse for active elements â”€â”€ */
 @keyframes glow-pulse {
 
   0%,
@@ -95,7 +95,7 @@ body {
   animation: glow-pulse 2s ease-in-out infinite;
 }
 
-/* ── Slide-up entry animation ── */
+/* â”€â”€ Slide-up entry animation â”€â”€ */
 @keyframes slide-up {
   from {
     opacity: 0;
@@ -125,12 +125,12 @@ body {
 }
 
 
-/* ── Focus Styles for TV/Keyboard ── */
+/* â”€â”€ Focus Styles for TV/Keyboard â”€â”€ */
 .focus-ring {
   @apply focus:outline-none focus-visible:ring-4 focus-visible:ring-cyan-400 focus-visible:ring-offset-4 focus-visible:ring-offset-slate-950 transition-all duration-200;
 }
 
-/* ── Scrollbar ── */
+/* â”€â”€ Scrollbar â”€â”€ */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -160,7 +160,7 @@ body {
   display: none;
 }
 
-/* ── Skeleton loading ── */
+/* â”€â”€ Skeleton loading â”€â”€ */
 @keyframes skeleton-loading {
   0% {
     background-position: -200px 0;
@@ -177,7 +177,7 @@ body {
   animation: skeleton-loading 1.5s infinite;
 }
 
-/* ── Fade in ── */
+/* â”€â”€ Fade in â”€â”€ */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -194,7 +194,7 @@ body {
   animation: fadeIn 0.6s ease-out;
 }
 
-/* ── Ken Burns for hero ── */
+/* â”€â”€ Ken Burns for hero â”€â”€ */
 @keyframes kenburns {
   0% {
     transform: scale(1.05);
@@ -209,7 +209,7 @@ body {
   }
 }
 
-/* ── Nav active underline ── */
+/* â”€â”€ Nav active underline â”€â”€ */
 @keyframes nav-underline {
   from {
     transform: scaleX(0);
@@ -225,7 +225,7 @@ body {
   animation: nav-underline 0.3s ease-out forwards;
 }
 
-/* ── Hover card lift ── */
+/* â”€â”€ Hover card lift â”€â”€ */
 .hover-lift {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }

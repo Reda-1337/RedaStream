@@ -101,7 +101,7 @@ export default function IPTVPlayer({ streamUrl, channelName }: IPTVPlayerProps) 
       </div>
 
       <p className="text-xs text-slate-500 text-center">
-        Live stream � Content provided by third-party sources � Availability may vary by channel
+        Live stream Ã¢â‚¬Â¢ Content provided by third-party sources Ã¢â‚¬Â¢ Availability may vary by channel
       </p>
     </div>
   )
