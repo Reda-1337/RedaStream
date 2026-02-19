@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import type { Channel } from '@/lib/iptv'
 import Header from '@/components/Header'
 import EnhancedFooter from '@/components/EnhancedFooter'
-import { FEATURED_CHANNELS } from '@/lib/iptv'
 import Link from 'next/link'
 import { Search, Play, X } from 'lucide-react'
 
@@ -19,21 +19,40 @@ const LANG_LABELS: Record<string, string> = {
 }
 
 export default function LiveTVPage() {
+  const [channels, setChannels] = useState<Channel[]>([])
   const [activeCategory, setActiveCategory] = useState<string>('All')
   const [activeLanguage, setActiveLanguage] = useState<string>('All')
   const [searchQuery, setSearchQuery] = useState('')
   const [visibleCount, setVisibleCount] = useState(48)
 
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const res = await fetch('/api/live/channels', { cache: 'no-store' })
+        const data = await res.json()
+        if (!alive) return
+        setChannels(Array.isArray(data?.channels) ? data.channels : [])
+      } catch {
+        if (alive) setChannels([])
+      }
+    })()
+
+    return () => {
+      alive = false
+    }
+  }, [])
+
   const filtered = useMemo(() => {
     const q = searchQuery.trim().toLowerCase()
 
-    return FEATURED_CHANNELS.filter((ch) => {
+    return channels.filter((ch) => {
       const catMatch = activeCategory === 'All' || ch.category === activeCategory
       const langMatch = activeLanguage === 'All' || ch.language === activeLanguage
       const searchMatch = !q || ch.name.toLowerCase().includes(q)
       return catMatch && langMatch && searchMatch
     })
-  }, [activeCategory, activeLanguage, searchQuery])
+  }, [channels, activeCategory, activeLanguage, searchQuery])
 
   useEffect(() => {
     setVisibleCount(48)
@@ -144,7 +163,7 @@ export default function LiveTVPage() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {visibleChannels.map((ch, i) => (
                 <Link
-                  key={i}
+                  key={ch.id || i}
                   href={`/live/watch?url=${encodeURIComponent(ch.streamUrl)}&name=${encodeURIComponent(ch.name)}`}
                   className="group block"
                 >
