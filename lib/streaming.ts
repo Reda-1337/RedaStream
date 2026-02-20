@@ -8,9 +8,9 @@ const BRAND_COLOR = '0EA5E9'
 
 const MOVIE_PROVIDERS = [
   {
-    name: 'Vidnest',
+    name: 'VidKing',
     priority: 0,
-    build: (id: string) => `https://vidnest.fun/movie/${id}`
+    build: (id: string) => `https://www.vidking.net/embed/movie/${id}`
   },
   {
     name: 'Videasy',
@@ -18,18 +18,23 @@ const MOVIE_PROVIDERS = [
     build: (id: string) => `https://player.videasy.net/movie/${id}?color=${BRAND_COLOR}&overlay=true`
   },
   {
-    name: 'VidSrc',
+    name: 'Vidnest',
     priority: 2,
+    build: (id: string) => `https://vidnest.fun/movie/${id}`
+  },
+  {
+    name: 'VidSrc',
+    priority: 3,
     build: (id: string) => `https://vidsrc.vip/embed/movie/${id}`
   }
 ] as const
 
 const TV_PROVIDERS = [
   {
-    name: 'Vidnest',
+    name: 'VidKing',
     priority: 0,
     build: (id: string, season: string, episode: string) =>
-      `https://vidnest.fun/tv/${id}/${season}/${episode}`
+      `https://www.vidking.net/embed/tv/${id}/${season}/${episode}`
   },
   {
     name: 'Videasy',
@@ -38,8 +43,14 @@ const TV_PROVIDERS = [
       `https://player.videasy.net/tv/${id}/${season}/${episode}?nextEpisode=true&autoplayNextEpisode=true&episodeSelector=true&color=${BRAND_COLOR}`
   },
   {
-    name: 'VidSrc',
+    name: 'Vidnest',
     priority: 2,
+    build: (id: string, season: string, episode: string) =>
+      `https://vidnest.fun/tv/${id}/${season}/${episode}`
+  },
+  {
+    name: 'VidSrc',
+    priority: 3,
     build: (id: string, season: string, episode: string) =>
       `https://vidsrc.vip/embed/tv/${id}/${season}/${episode}`
   }
