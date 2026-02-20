@@ -22,7 +22,7 @@ type Mode = "api" | "backup"
 const MODE_KEY = "redastream_player_mode"
 
 export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props) {
-  const [mode, setMode] = useState<Mode>("api")
+  const [mode, setMode] = useState<Mode>("backup")
   const [apiServers, setApiServers] = useState<RawServer[]>([])
   const [loadingApi, setLoadingApi] = useState(false)
   const [apiError, setApiError] = useState<string | null>(null)
@@ -66,17 +66,13 @@ export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props)
 
         if (!cancelled) {
           setApiServers(servers)
-          if (servers.length === 0) {
-            setApiError("No API servers available for this title")
-            setMode("backup")
-          }
+          if (servers.length === 0) setApiError("No API servers available for this title")
         }
       } catch (err: any) {
         if (!cancelled) {
           const msg = err?.name === "AbortError" ? "API timeout" : (err?.message || "Failed to load API servers")
           setApiError(msg)
           setApiServers([])
-          setMode("backup")
         }
       } finally {
         if (!cancelled) setLoadingApi(false)
@@ -90,6 +86,9 @@ export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props)
     }
   }, [apiPath, apiServers.length, loadingApi])
 
+  const apiReady = apiServers.length > 0 && !apiError
+  const shouldUseBackup = mode === "backup" || (mode === "api" && !apiReady)
+
   return (
     <div className="space-y-4">
       <div className="inline-flex rounded-xl border border-slate-800/70 bg-slate-900/60 p-1">
@@ -102,7 +101,7 @@ export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props)
               : "text-slate-400 hover:text-white"
           }`}
         >
-          API Player (Recommended)
+          API Player
         </button>
         <button
           type="button"
@@ -113,26 +112,20 @@ export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props)
               : "text-slate-400 hover:text-white"
           }`}
         >
-          Backup Player
+          Backup Player (Stable)
         </button>
       </div>
 
-      {apiError && mode === "api" && (
+      {mode === "api" && !apiReady && (
         <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
-          {apiError} — switched to backup when needed.
+          {loadingApi ? 'API is loading... using stable backup now.' : `API unavailable (${apiError || 'unknown error'}). Using stable backup.`}
         </div>
       )}
 
-      {mode === "api" ? (
-        loadingApi ? (
-          <div className="rounded-3xl border border-slate-800/60 bg-slate-950 px-6 py-10 text-center text-sm text-slate-300">
-            Loading API servers... (auto-fallback in ~9s)
-          </div>
-        ) : (
-          <PlayerEmbed initialServers={apiServers} />
-        )
-      ) : (
+      {shouldUseBackup ? (
         <RivePlayer type={type} tmdbId={tmdbId} season={season} episode={episode} />
+      ) : (
+        <PlayerEmbed initialServers={apiServers} />
       )}
     </div>
   )
