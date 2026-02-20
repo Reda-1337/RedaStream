@@ -56,7 +56,9 @@ export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props)
         setLoadingApi(true)
         setApiError(null)
 
-        const res = await fetch(apiPath, { cache: "no-store" })
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 9000)
+        const res = await fetch(apiPath, { cache: "no-store", signal: controller.signal }).finally(() => clearTimeout(timeout))
         if (!res.ok) throw new Error(`API player failed (${res.status})`)
 
         const data = await res.json()
@@ -71,7 +73,8 @@ export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props)
         }
       } catch (err: any) {
         if (!cancelled) {
-          setApiError(err?.message || "Failed to load API servers")
+          const msg = err?.name === "AbortError" ? "API timeout" : (err?.message || "Failed to load API servers")
+          setApiError(msg)
           setApiServers([])
           setMode("backup")
         }
@@ -123,7 +126,7 @@ export default function PlayerSwitcher({ type, tmdbId, season, episode }: Props)
       {mode === "api" ? (
         loadingApi ? (
           <div className="rounded-3xl border border-slate-800/60 bg-slate-950 px-6 py-10 text-center text-sm text-slate-300">
-            Loading API servers...
+            Loading API servers... (auto-fallback in ~9s)
           </div>
         ) : (
           <PlayerEmbed initialServers={apiServers} />
